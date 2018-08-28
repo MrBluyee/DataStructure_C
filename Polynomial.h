@@ -27,5 +27,7 @@ Polynomial *CreatePolynomial(ElemType *params,int length);
 void DestroyPolynomial(Polynomial *L);
 Polynomial *addPolynomial(Polynomial *pa,Polynomial *pb);
 Polynomial *subPolynomial(Polynomial *pa,Polynomial *pb);
+Polynomial *kMulPolynomial(Polynomial *pa,ElemType a);
+Polynomial *mulPolynomial(Polynomial *pa,Polynomial *pb);
 
 #endif

@@ -174,3 +174,30 @@ Polynomial *subPolynomial(Polynomial *pa,Polynomial *pb){
 	return L;
 }
 
+Polynomial *kMulPolynomial(Polynomial *pa,ElemType a){
+	Polynomial *L = InitPolynomial();
+	Node *ha = pa->This->next;
+	ElemType temp;
+	while(ha){
+		temp.exponent = ha->elem.exponent + a.exponent;
+		temp.coefficient = ha->elem.coefficient * a.coefficient;
+		L->appendElem(L, temp);
+		ha = ha->next;
+	}
+	return L;
+}
+
+Polynomial *mulPolynomial(Polynomial *pa,Polynomial *pb){
+	Polynomial *temp = InitPolynomial();
+	Polynomial *temp1,*temp2;
+	Node *hb = pb->This->next;
+	while(hb){
+		temp1 = kMulPolynomial(pa,hb->elem);
+		temp2 = addPolynomial(temp1,temp);
+		DestroyPolynomial(temp1);	
+		DestroyPolynomial(temp);
+		temp = temp2;
+		hb = hb->next;
+	}
+	return temp;
+}

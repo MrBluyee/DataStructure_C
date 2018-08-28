@@ -5,10 +5,11 @@
 int main(void){
 	//7+3x+9X^8+5x^17
 	ElemType params_a[4]={{7,0},{3,1},{9,8},{5,17}};
+	//8x+22x^7+-9x^8
 	ElemType params_b[3]={{8,1},{22,7},{-9,8}};
 	Polynomial *pa = CreatePolynomial(params_a,4);
 	Polynomial *pb = CreatePolynomial(params_b,3);
-	Polynomial *sum_ab,*sub_ab;
+	Polynomial *sum_ab,*sub_ab,*mul_ab,*kmul_a;
 	printf("pa = ");
 	pa->print(pa);
 	printf("pb = ");
@@ -19,8 +20,16 @@ int main(void){
 	sub_ab = subPolynomial(pa,pb);
 	printf("pa - pb = ");
 	sub_ab->print(sub_ab);
+	mul_ab = mulPolynomial(pa,pb);
+	printf("pa * pb = ");
+	mul_ab->print(mul_ab);
+	kmul_a = kMulPolynomial(pa,params_b[0]);
+	printf("pa * 8x = ");
+	kmul_a->print(kmul_a);
 	DestroyPolynomial(pa);
 	DestroyPolynomial(pb);
 	DestroyPolynomial(sum_ab);
+	DestroyPolynomial(mul_ab);
+	DestroyPolynomial(kmul_a);
 	return 0;
 }
