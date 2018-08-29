@@ -65,7 +65,7 @@ static void downPrint(LinearListStack *This){
 	LinearListStack_P *p = This->This;
 	int i;
 	for (i=0; i < p->length; i++){
-		printf("%c", *(p->top - i));
+		printf("%c", *(p->top - 1 - i));
 	}
 	printf("\n");
 }
@@ -73,7 +73,7 @@ static void downPrint(LinearListStack *This){
 static int getTop(LinearListStack *This,ElemType* e){
 	LinearListStack_P *p = This->This;
 	if (p->top == p->base) return -1;
-	*e = *(p->top);
+	*e = *(p->top-1);
 	return 0;
 }
 
@@ -94,8 +94,9 @@ static int push(LinearListStack *This,ElemType* e){
 static int pop(LinearListStack *This, ElemType* e){
 	LinearListStack_P *p = This->This;
 	if (p->top == p->base) return -1;
-	*e = *((p->top)--);
-	--p->length;
+	*e = *(p->top-1);
+	p->top--;
+	p->length--;
 	return 0;
 }
 
