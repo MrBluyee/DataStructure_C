@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <malloc.h>
 #include "LinearListStack.h"
-//线性表堆栈
+//线性表栈
 
 static void clear(LinearListStack *This);
 static int isEmpty(LinearListStack *This);

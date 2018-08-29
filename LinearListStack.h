@@ -8,7 +8,7 @@ typedef char ElemType;
 typedef struct LinearListStack_P{
 	ElemType *base;  
 	ElemType *top;   //栈顶指针
-	int length;      //当前线性表堆栈的长度
+	int length;      //当前线性表栈的长度
 	int size;    //当前分配的存储容量
 }LinearListStack_P;
 
@@ -25,8 +25,8 @@ typedef struct LinearListStack{
 }LinearListStack;
 
 /* Exported define -----------------------------------------------------------*/
-#define STACK_INIT_SIZE 100 //线性表堆栈存储空间的初始分配量
-#define STACKINCREMENT 10   //线性表堆栈存储空间的分配增量(当存储空间不够时要用到)
+#define STACK_INIT_SIZE 100 //线性表栈存储空间的初始分配量
+#define STACKINCREMENT 10   //线性表栈存储空间的分配增量(当存储空间不够时要用到)
 /* Exported macro ------------------------------------------------------------*/
 LinearListStack *InitLinearListStack();
 void DestroyLinearListStack(LinearListStack *L);
