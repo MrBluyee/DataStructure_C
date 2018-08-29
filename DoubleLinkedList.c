@@ -129,10 +129,10 @@ static int insertElem(DoubleLinkedList *This, int index, ElemType *e){
 	} 
 	if(!p || j > index) return -1;
 	temp->elem = *e;
+	p->next->prior = temp;
 	temp->prior = p;
 	temp->next = p->next;
 	p->next = temp;
-	p->next->prior = temp;
 	return 0;
 }
 
