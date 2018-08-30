@@ -34,6 +34,7 @@ LinearListStack *InitLinearListStack(){
 void DestroyLinearListStack(LinearListStack *L){
 	free(L->This);
 	free(L);
+	L = NULL;
 }
 
 static void clear(LinearListStack *This){
