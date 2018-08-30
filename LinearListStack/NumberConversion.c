@@ -103,7 +103,7 @@ LinearListStack *intToBin(int num){
 
 void displayConvert(int num){
 	int negative = 0;
-	LinearListStack *stack;
+	LinearListStack *stack = NULL;;
 	negative = num < 0 ? 1 : 0;
 	stack = intToDec(num);
 	negative ? printf("DEC: -") : printf("DEC: ");

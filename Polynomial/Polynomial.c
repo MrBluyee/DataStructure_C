@@ -34,11 +34,12 @@ void DestroyPolynomial(Polynomial *L){
 	L->clear(L);
 	free(L->This);
 	free(L);
+	L = NULL;
 }
 
 static void clear(Polynomial *This){
 	Node *p = This->This->next;
-	Node *temp;
+	Node *temp = NULL;
 	while(p){
 		temp = p;
 		p = p->next;

@@ -43,6 +43,7 @@ LinearList *InitLinearList(){
 void DestroyLinearList(LinearList *L){
 	free(L->This);
 	free(L);
+	L = NULL;
 }
 
 static void clear(LinearList *This){
@@ -121,7 +122,7 @@ static int insertElem(LinearList *This, int index, ElemType* e){
 		p->elem = newbase;//新基址
 		p->size += LISTINCREMENT;//增加存储容量
 	}
-	ElemType *elem_q, *elem_p;
+	ElemType *elem_q = NULL;, *elem_p = NULL;;
 	elem_q = &(p->elem[index]); //q为插入位置
 	for (elem_p = &(p->elem[p->length - 1]); elem_p >= elem_q; --elem_p){ //从ai到an-1依次后移，注意后移操作要从后往前进行
 		*(elem_p + 1) = *elem_p;
@@ -134,7 +135,7 @@ static int insertElem(LinearList *This, int index, ElemType* e){
 static int deleteElem(LinearList *This, int index, ElemType* e){
 	LinearList_P *p = This->This;
 	if (index<1 || index > p->length) return -1;
-	ElemType *elem_q, *elem_p;
+	ElemType *elem_q = NULL;, *elem_p = NULL;;
 	elem_p = &(p->elem[index]);//elem_p为被删除元素的位置
 	*e = *elem_p; //被删除的元素赋值给e
 	elem_q = p->elem + p->length - 1;//elem_q指向表尾最后一个元素

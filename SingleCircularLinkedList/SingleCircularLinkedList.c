@@ -39,12 +39,13 @@ void DestroySingleCircularLinkedList(SingleCircularLinkedList *L){
 	L->clear(L);
 	free(L->This);
 	free(L);
+	L = NULL;
 }
 
 static void clear(SingleCircularLinkedList *This){
 	Node *head = This->This;
 	Node *p = This->This->next;
-	Node *temp;
+	Node *temp = NULL;
 	while(p != head){
 		temp = p;
 		p = p->next;
@@ -159,7 +160,7 @@ static int insertElem(SingleCircularLinkedList *This, int index, ElemType *e){
 static int deleteElem(SingleCircularLinkedList *This, int index, ElemType* e){
 	Node *head = This->This;
 	Node *p = This->This;
-	Node *temp;
+	Node *temp = NULL;
 	int j = 0;
 	while(p->next != head && j < index){
 		p = p->next;
@@ -190,7 +191,7 @@ static int appendElem(SingleCircularLinkedList *This, ElemType *e){
 static int popElem(SingleCircularLinkedList *This, ElemType* e){
 	Node *head = This->This;
 	Node *p = This->This;
-	Node *temp;
+	Node *temp = NULL;
 	while(p->next->next != head){
 		p = p->next;
 	} 

@@ -37,11 +37,12 @@ void DestroySingleLinkedList(SingleLinkedList *L){
 	L->clear(L);
 	free(L->This);
 	free(L);
+	L = NULL;
 }
 
 static void clear(SingleLinkedList *This){
 	Node *p = This->This->next;
-	Node *temp;
+	Node *temp = NULL;
 	while(p){
 		temp = p;
 		p = p->next;
@@ -135,7 +136,7 @@ static int insertElem(SingleLinkedList *This, int index, ElemType *e){
 
 static int deleteElem(SingleLinkedList *This, int index, ElemType* e){
 	Node *p = This->This;
-	Node *temp;
+	Node *temp = NULL;
 	int j = 0;
 	while(p->next && j < index){
 		p = p->next;
@@ -166,7 +167,7 @@ static int appendElem(SingleLinkedList *This, ElemType *e){
 
 static int popElem(SingleLinkedList *This, ElemType* e){
 	Node *p = This->This;
-	Node *temp;
+	Node *temp = NULL;
 	while(p->next->next){
 		p = p->next;
 	} 

@@ -9,7 +9,7 @@ int main(void){
 	ElemType params_b[3]={{8,1},{22,7},{-9,8}};
 	Polynomial *pa = CreatePolynomial(params_a,4);
 	Polynomial *pb = CreatePolynomial(params_b,3);
-	Polynomial *sum_ab,*sub_ab,*mul_ab,*kmul_a;
+	Polynomial *sum_ab = NULL;,*sub_ab = NULL;,*mul_ab = NULL;,*kmul_a = NULL;;
 	printf("pa = ");
 	pa->print(pa);
 	printf("pb = ");

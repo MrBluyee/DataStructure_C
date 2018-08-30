@@ -5,8 +5,8 @@
 int main(void){
 	int i;
 	ElemType elem,elem1;
-	Node *tempn;
-	Node *tempm;
+	Node *tempn = NULL;;
+	Node *tempm = NULL;;
 	DoubleCircularLinkedList *list = InitDoubleCircularLinkedList();
 	printf("list is empty:%d\n",list->isEmpty(list));
 	for(i=0;i<10;i++){
