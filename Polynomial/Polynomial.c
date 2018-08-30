@@ -190,7 +190,7 @@ Polynomial *kMulPolynomial(Polynomial *pa,ElemType a){
 
 Polynomial *mulPolynomial(Polynomial *pa,Polynomial *pb){
 	Polynomial *temp = InitPolynomial();
-	Polynomial *temp1,*temp2;
+	Polynomial *temp1 = NULL,*temp2 = NULL;
 	Node *hb = pb->This->next;
 	while(hb){
 		temp1 = kMulPolynomial(pa,hb->elem);
