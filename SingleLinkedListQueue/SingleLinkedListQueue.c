@@ -72,7 +72,6 @@ static QNode *getHead(SingleLinkedListQueue *This){
 }
 
 static int enQueue(SingleLinkedListQueue *This,QNode *n){
-	QNode *p = This->This;
 	if(!n) return -1;
 	This->tear->next = n;
 	n->next = NULL;
