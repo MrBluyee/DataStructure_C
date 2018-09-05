@@ -1,42 +1,82 @@
 #include <stdio.h>
 #include <malloc.h>
-#include "SingleLinkedList.h"
+#include "MyString.h"
+
+int printMyString(MyString *str){
+	printf("%s, ",str->str);
+	printf("length :%d\n",str->length);
+	return 0;
+}
+
+int printMyStringElem(MyString **str){
+	printf("%s ",(*str)->str);
+	return 0;
+}
 
 int main(void){
 	int i;
-	ElemType elem,elem1;
-	SingleLinkedList *list = InitSingleLinkedList();
-	printf("list is empty:%d\n",list->isEmpty(list));
-	for(i=0;i<10;i++){
-		list->appendElem(list,&i);
+	char words[] = {"without new experiences, something inside of us sleeps."};
+	MyString *str_a = NULL;
+	MyString *str_b = NULL;
+	MyString *str_c = NULL;
+	MyStringArray *str_array = NULL;
+
+	str_a = myStringAssign("hello ");
+	str_c = myStringAssign("hello ");
+
+	printf("str_a :");
+	printMyString(str_a);
+
+	printf("is MyString empty: %d\n",isMyStringEmpty(str_a));
+
+	if(compareMyString(str_a,str_c)==0){
+		printf("str_a equals str_c\n");
+	}else{
+		printf("str_a is not equal str_c\n");
 	}
-	list->print(list);
-	printf("list is empty:%d\n",list->isEmpty(list));
-	printf("list length:%d\n",list->length(list));
-	list->clear(list);
-	for (i = 10; i < 20; i++){
-		list->appendElem(list,&i);
-	}	
-	list->print(list);
-	list->getElem(list,3,&elem1);
-	printf("the elem of index 3 is %d\n",elem1);
-	elem = 31;
-	list->modifyElem(list,3,&elem);
-	list->getElem(list,3,&elem1);
-	printf("modify the elem of index 3 to %d\n",elem1);
-	list->print(list);
-	elem = 25;
-	list->insertElem(list,5,&elem);
-	printf("insert elem %d to index 5\n",elem);
-	list->print(list);
-	list->deleteElem(list,7,&elem);
-	printf("delete elem %d of index 7\n",elem);
-	list->print(list);
-	elem = 14;
-	printf("the index of 14 is %d\n",list->indexElem(list,&elem));
-	list->popElem(list,&elem);
-	printf("pop elem %d\n",elem);
-	list->print(list);
-	DestroySingleLinkedList(list);
+
+	clearMyString(str_a);
+
+	printf("is MyString empty: %d\n",isMyStringEmpty(str_a));
+
+	if(compareMyString(str_a,str_c)==0){
+		printf("str_a equals str_c\n");
+	}else{
+		printf("str_a is not equal str_c\n");
+	}
+
+	destroyMyString(str_a);
+	str_a = copyMyString(str_c);
+	
+
+	str_b = myStringAssign("Mr Bluyee");
+	printf("str_b :");
+	printMyString(str_b);
+
+	destroyMyString(str_c);
+	str_c = concatMyString(str_a,str_b);
+	printf("str_c :");
+	printMyString(str_c);
+
+	printf("the char \'B\' index: %d\n", myStringIndexChar(str_c,'B',0));
+
+	insertMyString(str_a,str_b,str_a->length);
+	printf("str_a :");
+	printMyString(str_a);
+
+	destroyMyString(str_c);
+	str_c = substrMyString(str_a,0,5);
+	printf("str_c :");
+	printMyString(str_c);
+
+	destroyMyString(str_c);
+	str_c = myStringAssign(words);
+	str_array = splitMyString(str_c,' ');
+	str_array->traverse(str_array,printMyStringElem);
+
+	destroyMyString(str_a);
+	destroyMyString(str_b);
+	destroyMyString(str_c);
+	DestroyMyStringArray(str_array);
 	return 0;
 }

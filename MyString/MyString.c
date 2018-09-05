@@ -117,7 +117,7 @@ int myStringIndexChar(MyString *S,char indexElem,int pos){
 int insertMyString(MyString *S1,MyString *S2,int pos){
 	int i;
 	if(!S2->str) return -1;
-	if(pos < 0 || pos >= S1->length) return -1;
+	if(pos < 0 || pos > S1->length) return -1;
 	S1->str = (char *)realloc(S1->str,(S1->length + S2->length + 1)*sizeof(char));
 	if(!S1->str) return -1;
 	for(i=S1->length;i>=pos;i--){
@@ -147,4 +147,45 @@ MyString *substrMyString(MyString *S,int start,int end){
 	*(temp->str + length) = '\0';
 	temp->length = length;
 	return temp;
+}
+
+MyStringArray *splitMyString(MyString *S,char splitElem){
+	int start = 0,end = 0,index = 0;
+	MyStringArray *strarray = NULL;
+	MyString *strtemp = NULL;
+	index = myStringIndexChar(S,splitElem,0);
+	if(index == -1) return NULL;
+	strarray = InitMyStringArray();
+	end = index;
+	if(end != start){
+		strtemp = substrMyString(S,start,end);
+		strarray->tearPush(strarray,strtemp);
+		destroyMyString(strtemp);
+		if(end == S->length){
+			return strarray;
+		}
+	}
+	index++;
+	start = index;
+	while(index > 0){
+		index = myStringIndexChar(S,splitElem,index);
+		if(index != -1){
+			end = index;
+			strtemp = substrMyString(S,start,end);
+			strarray->tearPush(strarray,strtemp);
+			destroyMyString(strtemp);
+			if(end == S->length){
+				break;
+			}
+			index++;
+			start = index;
+		}
+	}
+	if(end != S->length){
+		end = S->length;
+		strtemp = substrMyString(S,start,end);
+		strarray->tearPush(strarray,strtemp);
+		destroyMyString(strtemp);
+	}
+	return strarray;
 }
