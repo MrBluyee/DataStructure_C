@@ -51,5 +51,6 @@ int myStringIndexChar(MyString *S,char indexElem,int pos);
 int insertMyString(MyString *S1,MyString *S2,int pos);
 MyString *substrMyString(MyString *S,int start,int end);
 MyStringArray *splitMyString(MyString *S,char splitElem);
+int myStringIndexSubString(MyString *S,MyString *substr,int pos);
 
 #endif

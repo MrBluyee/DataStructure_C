@@ -189,3 +189,48 @@ MyStringArray *splitMyString(MyString *S,char splitElem){
 	}
 	return strarray;
 }
+
+static int *getKMPNext(MyString *substr){
+	int *nextval = (int *)malloc((substr->length)*sizeof(int));
+	int j=0,k=-1;
+	if(nextval){
+		*nextval = -1;
+		while(j<substr->length){
+			if(k == -1 || *(substr->str+j) == *(substr->str+k)){
+				if(*(substr->str+(++j)) == *(substr->str+(++k))){ //两个字符相等时跳过
+					*(nextval+j) = *(nextval+k);
+				}else{
+					*(nextval+j) = k;
+				}
+			}else{
+				k = *(nextval+k);
+			}
+		}
+		return nextval;
+	}else{
+		return NULL;
+	}
+}
+
+int myStringIndexSubString(MyString *S,MyString *substr,int pos){ //KMP算法
+	int i = pos,j = 0;
+	if(!S || !substr || pos > S->length) return -1;
+	int *nextval = getKMPNext(substr);
+	if(!nextval) return -1;
+	while(i < S->length && j < substr->length){
+		if(j = -1 || *(S->str + i) == *(substr->str + j)){
+			i++; //当j为-1时，要移动的是i
+			j++; //j归0
+		}else{
+			j = *(nextval+j); //i不需要回溯，j回到指定位置
+		}
+	}
+	free(nextval);
+	printf("%d\n",j);
+	if(j == substr->length){
+		return i - j;
+	}else{
+		return -1;
+	}
+}
+
