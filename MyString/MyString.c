@@ -218,19 +218,21 @@ int myStringIndexSubString(MyString *S,MyString *substr,int pos){ //KMP算法
 	int *nextval = getKMPNext(substr);
 	if(!nextval) return -1;
 	while(i < S->length && j < substr->length){
-		if(j = -1 || *(S->str + i) == *(substr->str + j)){
-			i++; //当j为-1时，要移动的是i
-			j++; //j归0
+		if(*(S->str + i) == *(substr->str + j)){
+			i++; 
+			j++; 
 		}else{
 			j = *(nextval+j); //i不需要回溯，j回到指定位置
+			if(j == -1){
+				i++; //当j为-1时，要移动的是i
+				j++; //j归0
+			}
 		}
 	}
 	free(nextval);
-	printf("%d\n",j);
 	if(j == substr->length){
 		return i - j;
 	}else{
 		return -1;
 	}
 }
-

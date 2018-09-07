@@ -49,7 +49,7 @@ int main(void){
 	str_a = copyMyString(str_c);
 	
 
-	str_b = myStringAssign("abaabcac");
+	str_b = myStringAssign("Mr Bluyee");
 	printf("str_b :");
 	printMyString(str_b);
 
@@ -58,9 +58,9 @@ int main(void){
 	printf("str_c :");
 	printMyString(str_c);
 	
-	printf("the MyString :");
-	printMyString(str_b);
-	//printf("index : %d\n",myStringIndexSubString(str_c,str_b,0));
+	printf("the MyString : Mr Bluyee index: ");
+	i = myStringIndexSubString(str_c,str_b,0);
+	printf("%d\n", i);
 	
 	printf("the char \'B\' index: %d\n", myStringIndexChar(str_c,'B',0));
 
