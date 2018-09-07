@@ -44,27 +44,33 @@ int main(void){
 	}else{
 		printf("str_a is not equal str_c\n");
 	}
-
+	
 	destroyMyString(str_a);
 	str_a = copyMyString(str_c);
 	
-
 	str_b = myStringAssign("Mr Bluyee");
 	printf("str_b :");
 	printMyString(str_b);
 
-	destroyMyString(str_c);
-	str_c = concatMyString(str_a,str_b);
-	printf("str_c :");
-	printMyString(str_c);
+	concatMyString(str_a,str_b);
+	printf("str_a :");
+	printMyString(str_a);
 	
 	printf("the MyString : Mr Bluyee index: ");
-	i = myStringIndexSubString(str_c,str_b,0);
+	i = myStringIndexSubString(str_a,str_b,0);
 	printf("%d\n", i);
 	
-	printf("the char \'B\' index: %d\n", myStringIndexChar(str_c,'B',0));
+	printf("the char \'B\' index: %d\n", myStringIndexChar(str_a,'B',0));
 
 	insertMyString(str_a,str_b,str_a->length);
+	printf("str_a :");
+	printMyString(str_a);
+	
+	replaceMyString(str_a,str_b,6,str_a->length);
+	printf("str_a :");
+	printMyString(str_a);
+	
+	deleteMyString(str_a,6,str_a->length);
 	printf("str_a :");
 	printMyString(str_a);
 

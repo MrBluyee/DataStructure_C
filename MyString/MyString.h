@@ -5,7 +5,8 @@
 
 typedef struct MyString{
 	char *str;  
-	int length;
+	int length; //字符串长度
+	int size; //空间大小
 }MyString;
 
 typedef struct MyStringArray_P
@@ -46,9 +47,11 @@ int clearMyString(MyString *S);
 void destroyMyString(MyString *S);
 int compareMyString(MyString *S1,MyString *S2);
 MyString *copyMyString(MyString *S);
-MyString *concatMyString(MyString *S1,MyString *S2);
 int myStringIndexChar(MyString *S,char indexElem,int pos);
 int insertMyString(MyString *S1,MyString *S2,int pos);
+int deleteMyString(MyString *S,int start,int end);
+int concatMyString(MyString *S1,MyString *S2);
+int replaceMyString(MyString *S1,MyString *S2,int start,int end);
 MyString *substrMyString(MyString *S,int start,int end);
 MyStringArray *splitMyString(MyString *S,char splitElem);
 int myStringIndexSubString(MyString *S,MyString *substr,int pos);

@@ -11,6 +11,7 @@ MyString *myStringAssign(char *str){
 	}
 	str_length++;
 	S->str = (char *)malloc(str_length*sizeof(char));
+	S->size = str_length;
 	if(!S->str){
 		free(S);
 		return NULL;
@@ -26,6 +27,10 @@ int myStringLength(MyString *S){
 	return S->length;
 }
 
+int myStringRemainSpace(MyString *S){
+	return S->size - S->length -1;
+}
+
 int isMyStringEmpty(MyString *S){
 	if(S->length){
 		return 0;
@@ -35,10 +40,7 @@ int isMyStringEmpty(MyString *S){
 }
 
 int clearMyString(MyString *S){
-	if(S->str){
-		free(S->str);
-		S->str = NULL;
-	}
+	*S->str = '\0';
 	S->length = 0;
 }
 
@@ -69,7 +71,8 @@ MyString *copyMyString(MyString *S){
 	if(!S->str) return NULL;
 	MyString *temp = (MyString *)malloc(sizeof(MyString));
 	if(!temp) return NULL;
-	temp->str = (char *)malloc((S->length+1)*sizeof(char));
+	temp->size = S->length + 1;
+	temp->str = (char *)malloc(temp->size*sizeof(char));
 	if(!temp->str){
 		free(temp);
 		return NULL;
@@ -78,26 +81,6 @@ MyString *copyMyString(MyString *S){
 	for(i=0;i<S->length+1;i++){
 		*(temp->str + i) = *(S->str + i);
 	}
-	return temp;
-}
-
-MyString *concatMyString(MyString *S1,MyString *S2){
-	int i;
-	if(!S1->str || !S2->str) return NULL;
-	MyString *temp = (MyString *)malloc(sizeof(MyString));
-	if(!temp) return NULL;
-	temp->str = (char *)malloc((S1->length + S2->length + 1)*sizeof(char));
-	if(!temp->str){
-		free(temp);
-		return NULL;
-	}
-	for(i=0;i<S1->length;i++){
-		*(temp->str + i) = *(S1->str + i);
-	}
-	for(i=0;i<S2->length+1;i++){
-		*(temp->str + S1->length + i) = *(S2->str + i);
-	}
-	temp->length = S1->length + S2->length;
 	return temp;
 }
 
@@ -118,8 +101,11 @@ int insertMyString(MyString *S1,MyString *S2,int pos){
 	int i;
 	if(!S2->str) return -1;
 	if(pos < 0 || pos > S1->length) return -1;
-	S1->str = (char *)realloc(S1->str,(S1->length + S2->length + 1)*sizeof(char));
-	if(!S1->str) return -1;
+	if(myStringRemainSpace(S1) < S2->length){
+		S1->size += S2->length - myStringRemainSpace(S1);
+		S1->str = (char *)realloc(S1->str,S1->size*sizeof(char));
+		if(!S1->str) return -1;
+	}
 	for(i=S1->length;i>=pos;i--){
 		*(S1->str + S2->length + i) = *(S1->str + i);
 	}
@@ -136,7 +122,8 @@ MyString *substrMyString(MyString *S,int start,int end){
 	MyString *temp = (MyString *)malloc(sizeof(MyString));
 	if(!temp) return NULL;
 	length = end - start;
-	temp->str = (char *)malloc((length+1)*sizeof(char));
+	temp->size = length+1;
+	temp->str = (char *)malloc(temp->size*sizeof(char));
 	if(!temp->str){
 		free(temp);
 		return NULL;
@@ -147,6 +134,46 @@ MyString *substrMyString(MyString *S,int start,int end){
 	*(temp->str + length) = '\0';
 	temp->length = length;
 	return temp;
+}
+
+int deleteMyString(MyString *S,int start,int end){
+	int i,length;
+	if(start < 0 || start >= S->length || end <= 0 || end > S->length || end <= start) return -1;
+	length = S->length - end + 1;
+	for(i=0;i<=length;i++){
+		*(S->str + start + i) = *(S->str + end + i);
+	}
+	S->length -= (end - start);
+	return 0;
+}
+
+int concatMyString(MyString *S1,MyString *S2){
+	int i;
+	if(!S2->str || !S1) return -1;
+	if(myStringRemainSpace(S1) < S2->length){
+		S1->size += (S2->length - myStringRemainSpace(S1));
+		S1->str = (char *)realloc(S1->str,S1->size*sizeof(char));
+		if(!S1->str) return -1;
+	}
+	for(i=0;i<=S2->length;i++){
+		*(S1->str + S1->length + i) = *(S2->str + i);
+	}
+	S1->length += S2->length;
+	return 0;
+}
+
+int replaceMyString(MyString *S1,MyString *S2,int start,int end){
+	if(start < 0 || start >= S1->length || end <= 0 || end > S1->length || end < start) return -1;
+	if(end>start){
+		if(deleteMyString(S1,start,end) == -1){
+			return -1;
+		}
+	}
+	if(insertMyString(S1,S2,start) == -1){
+		return -1;
+	}else{
+		return 0;
+	}
 }
 
 MyStringArray *splitMyString(MyString *S,char splitElem){
