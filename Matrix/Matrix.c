@@ -2,64 +2,169 @@
 #include <malloc.h>
 #include "Matrix.h"
 
-Matrix *creatMatrix(void *data,int data_len, Dtype dtype, Dshape dshape){
+//从连续的数据创建数组
+Matrix *creatMatrixFromDatas(double *data,int data_len, Dshape dshape){
 	int i = 0; 
 	if(!data) return NULL;
 	Matrix *m = (Matrix *)malloc(sizeof(Matrix));
 	if(!m) return NULL;
-	switch(dtype){
-		case d_uchar:
-			m->array = (unsigned char *)malloc(data_len*sizeof(unsigned char));
-			break;
-		case d_char:
-			m->array = (char *)malloc(data_len*sizeof(char));
-			break;
-		case d_int:
-			m->array = (int *)malloc(data_len*sizeof(int));
-			break;
-		case d_uint:
-			m->array = (unsigned int *)malloc(data_len*sizeof(unsigned int));
-			break;
-		case d_float:
-			m->array = (float *)malloc(data_len*sizeof(float));
-			break;
-		case d_double:
-			m->array = (double *)malloc(data_len*sizeof(double));
-			break;
+	m->array = (double *)malloc(data_len*sizeof(double));
 	}
 	if(!m->array){
 		free(m);
 		return NULL;
 	}
 	for(i=0;i<data_len;i++){
-		switch(dtype){
-			case d_uchar:
-				*((unsigned char *)m->array+i) = *((unsigned char *)data+i);
-				break;
-			case d_char:
-				*((char *)m->array+i) = *((char *)data+i);
-				break;
-			case d_int:
-				*((int *)m->array+i) = *((int *)data+i);
-				break;
-			case d_uint:
-				*((unsigned int *)m->array+i) = *((unsigned int *)data+i);
-				break;
-			case d_float:
-				*((float *)m->array+i) = *((float *)data+i);
-				break;
-			case d_double:
-				*((double *)m->array+i) = *((double *)data+i);
-				break;
-		}
+		*(m->array+i) = *(data+i);
 	}
-	m->dtype = dtype;
 	m->dshape = dshape;
 	m->length = data_len;
 	m->size = data_len;
 	return m;
 }
 
+//创建单值数组
+Matrix *creatMatrixFromValue(double value, Dshape dshape){
+	int i = 0,w,x,y,z,data_len; 
+	z = dshape.shape[3];
+	y = dshape.shape[2] * z;
+	x = dshape.shape[1] * y;
+	w = dshape.shape[0] * x;
+	if(w != 0){
+		data_len = w;
+	}else if(x != 0){
+		data_len = x;
+	}else if(y != 0){
+		data_len = y;
+	}else if(z != 0){
+		data_len = z;
+	}
+	Matrix *m = (Matrix *)malloc(sizeof(Matrix));
+	if(!m) return NULL;
+	switch(dtype){
+		m->array = (double *)malloc(data_len*sizeof(double));
+	}
+	if(!m->array){
+		free(m);
+		return NULL;
+	}
+	for(i=0;i<data_len;i++){
+		*(m->array+i) = value;
+	}
+	m->dshape = dshape;
+	m->length = data_len;
+	m->size = data_len;
+	return m;
+}
+
+//指定步长，创建等间隔值的数组
+Matrix *creatMatrixFromArange(double startVal, double stepVal,Dshape dshape){
+	int i = 0,w,x,y,z,data_len; 
+	z = dshape.shape[3];
+	y = dshape.shape[2] * z;
+	x = dshape.shape[1] * y;
+	w = dshape.shape[0] * x;
+	if(w != 0){
+		data_len = w;
+	}else if(x != 0){
+		data_len = x;
+	}else if(y != 0){
+		data_len = y;
+	}else if(z != 0){
+		data_len = z;
+	}
+	Matrix *m = (Matrix *)malloc(sizeof(Matrix));
+	if(!m) return NULL;
+	switch(dtype){
+		m->array = (double *)malloc(data_len*sizeof(double));
+	}
+	if(!m->array){
+		free(m);
+		return NULL;
+	}
+	for(i=0;i<data_len;i++){
+		*(m->array+i) = startVal + stepVal * i;
+	}
+	m->dshape = dshape;
+	m->length = data_len;
+	m->size = data_len;
+	return m;
+}
+
+//指定范围之间的均匀间隔数量，创建等间隔值的数组
+Matrix *creatMatrixFromLinspace(double startVal, double endVal,Dshape dshape){
+	int i = 0,w,x,y,z,data_len;
+	double stepVal;
+	z = dshape.shape[3];
+	y = dshape.shape[2] * z;
+	x = dshape.shape[1] * y;
+	w = dshape.shape[0] * x;
+	if(w != 0){
+		data_len = w;
+	}else if(x != 0){
+		data_len = x;
+	}else if(y != 0){
+		data_len = y;
+	}else if(z != 0){
+		data_len = z;
+	}
+	Matrix *m = (Matrix *)malloc(sizeof(Matrix));
+	if(!m) return NULL;
+	switch(dtype){
+		m->array = (double *)malloc(data_len*sizeof(double));
+	}
+	if(!m->array){
+		free(m);
+		return NULL;
+	}
+	stepVal = (endVal - startVal) / data_len;
+	for(i=0;i<data_len;i++){
+		*(m->array+i) = startVal + stepVal * i;
+	}
+	m->dshape = dshape;
+	m->length = data_len;
+	m->size = data_len;
+	return m;
+}
+
+	
+//创建全0数组
+Matrix *creatZerosMatrix(Dshape dshape){
+	return creatMatrixFromValue(0, dshape);
+}
+
+//创建全1数组
+Matrix *creatOnesMatrix(Dshape dshape){
+	return creatMatrixFromValue(1, dshape);
+}
+
+//创建二维单位阵
+Matrix *creatIdentitySecondOrderMatrix(Dshape dshape){
+	if(dshape.shape[0] != 0 || dshape.shape[1] != 0 || dshape.shape[2] <= 1 || dshape.shape[2] != dshape.shape[3]) return NULL;//dshape不是二维方阵
+	int i = 0,data_len;
+	data_len = dshape.shape[2] * dshape.shape[3];
+	Matrix *m = (Matrix *)malloc(sizeof(Matrix));
+	if(!m) return NULL;
+	switch(dtype){
+		m->array = (double *)malloc(data_len*sizeof(double));
+	}
+	if(!m->array){
+		free(m);
+		return NULL;
+	}
+	for(i=0;i<data_len;i++){
+		*(m->array+i) = 0;
+	}
+	for(i=0;i<dshape.shape[3];i++){
+		*(m->array+i*dshape.shape[3] + i) = 1;
+	}
+	m->dshape = dshape;
+	m->length = data_len;
+	m->size = data_len;
+	return m;
+}
+
+//数组的shape初始化
 void initDshape(Dshape *dshape,int *shapeval){
 	int i;
 	if(!dshape) return;
@@ -68,11 +173,13 @@ void initDshape(Dshape *dshape,int *shapeval){
 	}
 }
 
+//清空数组，保留空间
 void clearMatrix(Matrix *m){
 	if(!m) return;
 	m->length = 0;
 }
 
+//删除数组，并释放空间
 void destroyMatrix(Matrix *m){
 	free(m->array);
 	m->array = NULL;
@@ -80,12 +187,14 @@ void destroyMatrix(Matrix *m){
 	m = NULL;
 }
 
+//重新调整数组shape
 int reshape(Matrix *m,Dshape dshape){
 	if(!m) return -1;
 	m->dshape = dshape;
 	return 0;
 }
 
+//打印数组shape
 void printShape(Matrix *m){
 	int i = 0,j;
 	if(!m) return;
@@ -101,6 +210,18 @@ void printShape(Matrix *m){
 	printf(")\n");
 }
 
+//获得数组的维数，最多4维
+int getMatrixNdim(Matrix *m){
+	int i,ndim = 0;
+	for(i=0;i<4;i++){
+		if(m->dshape.shape[i] != 0){
+			ndim ++;
+		}
+	}
+	return ndim;
+}
+
+//打印数组
 void printarray(Matrix *m){
 	int i,w,x,y,z;
 	if(!m) return;
@@ -137,25 +258,7 @@ void printarray(Matrix *m){
 		}else{
 			printf(", ");
 		}
-		switch(m->dtype){
-			case d_uchar:
-				printf("%c",*((unsigned char *)m->array + i));
-				break;
-			case d_char:
-				printf("%c",*((char *)m->array + i));
-				break;
-			case d_int:
-				printf("%d",*((int *)m->array + i));
-				break;
-			case d_uint:
-				printf("%d",*((unsigned int *)m->array + i));
-				break;
-			case d_float:
-				printf("%f",*((float *)m->array + i));
-				break;
-			case d_double:
-				printf("%f",*((double *)m->array + i));
-				break;
+		printf("%f",*(m->array + i));
 		}
 	}
 	for(i=0;i<4;i++){
@@ -166,6 +269,7 @@ void printarray(Matrix *m){
 	printf("\n");
 }
 
+//求二维方阵数组的迹
 double getSecondOrderMatrixTrace(Matrix *m){
 	double result = 0;
 	int i;
@@ -173,31 +277,13 @@ double getSecondOrderMatrixTrace(Matrix *m){
 	if(m->dshape.shape[0] != 0 || m->dshape.shape[1] != 0 || m->dshape.shape[2] == 0) return 0; //非二阶矩阵
 	if(m->dshape.shape[2] != m->dshape.shape[3]) return 0; //非方阵
 	for(i=0;i<m->dshape.shape[2];i++){
-		switch(m->dtype){
-			case d_uchar:
-				result += *((unsigned char *)m->array + i*m->dshape.shape[2] + i);
-				break;
-			case d_char:
-				result += *((char *)m->array + i*m->dshape.shape[2] + i);
-				break;
-			case d_int:
-				result += *((int *)m->array + i*m->dshape.shape[2] + i);
-				break;
-			case d_uint:
-				result += *((unsigned int *)m->array + i*m->dshape.shape[2] + i);
-				break;
-			case d_float:
-				result += *((float *)m->array + i*m->dshape.shape[2] + i);
-				break;
-			case d_double:
-				result += *((double *)m->array + i*m->dshape.shape[2] + i);
-				break;
-		}
+		result += *(m->array + i*m->dshape.shape[2] + i);
 	}
 	return result;
 }
 
-int getMatrixElem(Matrix *m,int dimen0,int dimen1,int dimen2,int dimen3,void *elem){
+//获得数组的元素
+int getMatrixElem(Matrix *m,int dimen0,int dimen1,int dimen2,int dimen3,double *elem){
 	int w,x,y,z,index;
 	if(!m) return -1;
 	if((dimen0 != 0 && m->dshape.shape[0] == 0) || (dimen1 != 0 && m->dshape.shape[1] == 0)) return -1;
@@ -209,87 +295,31 @@ int getMatrixElem(Matrix *m,int dimen0,int dimen1,int dimen2,int dimen3,void *el
 	x = m->dshape.shape[1] * y;
 	w = m->dshape.shape[0] * x;
 	index = dimen0*x + dimen1*y + dimen2*z + dimen3;
-	switch(m->dtype){
-		case d_uchar:
-			*((unsigned char *)elem) = *((unsigned char *)m->array + index);
-			break;
-		case d_char:
-			*((char *)elem) = *((char *)m->array + index);
-			break;
-		case d_int:
-			*((int *)elem) = *((int *)m->array + index);
-			break;
-		case d_uint:
-			*((unsigned int *)elem) = *((unsigned int *)m->array + index);
-			break;
-		case d_float:
-			*((float *)elem) = *((float *)m->array + index);
-			break;
-		case d_double:
-			*((double *)elem) = *((double *)m->array + index);
-			break;
-	}
+	*elem = *(m->array + index);
 	return 0;
 }
 
+//复制数组
 Matrix *copyMatrix(Matrix *m){
 	int i = 0;
 	if(!m) return NULL;
 	Matrix *copym = (Matrix *)malloc(sizeof(Matrix));
 	if(!copym) return NULL;
-	copym->dtype = m->dtype;
 	copym->dshape = m->dshape;
 	copym->length = m->length;
 	copym->size = m->length;
-	switch(copym->dtype){
-		case d_uchar:
-			copym->array = (unsigned char *)malloc(copym->length*sizeof(unsigned char));
-			break;
-		case d_char:
-			copym->array = (char *)malloc(copym->length*sizeof(char));
-			break;
-		case d_int:
-			copym->array = (int *)malloc(copym->length*sizeof(int));
-			break;
-		case d_uint:
-			copym->array = (unsigned int *)malloc(copym->length*sizeof(unsigned int));
-			break;
-		case d_float:
-			copym->array = (float *)malloc(copym->length*sizeof(float));
-			break;
-		case d_double:
-			copym->array = (double *)malloc(copym->length*sizeof(double));
-			break;
-	}
+	copym->array = (double *)malloc(copym->length*sizeof(double));
 	if(!copym->array){
 		free(copym);
 		return NULL;
 	}
 	for(i=0;i<copym->length;i++){
-		switch(copym->dtype){
-			case d_uchar:
-				*((unsigned char *)copym->array+i) = *((unsigned char *)m->array+i);
-				break;
-			case d_char:
-				*((char *)copym->array+i) = *((char *)m->array+i);
-				break;
-			case d_int:
-				*((int *)copym->array+i) = *((int *)m->array+i);
-				break;
-			case d_uint:
-				*((unsigned int *)copym->array+i) = *((unsigned int *)m->array+i);
-				break;
-			case d_float:
-				*((float *)copym->array+i) = *((float *)m->array+i);
-				break;
-			case d_double:
-				*((double *)copym->array+i) = *((double *)m->array+i);
-				break;
-		}
+		*(copym->array+i) = *(m->array+i);
 	}
 	return copym;
 }
 
+//提取二维数组的连续多行，返回一个包含多行内容的子数组
 Matrix *getSecondOrderMatrixRows(Matrix *m,int startRow,int endRow){
 	int i = 0;
 	if(!m) return NULL;
@@ -302,7 +332,6 @@ Matrix *getSecondOrderMatrixRows(Matrix *m,int startRow,int endRow){
 		if(startRow < 0 || startRow >= m->dshape.shape[2] || endRow > m->dshape.shape[2] || endRow < startRow) return NULL;
 		subm = (Matrix *)malloc(sizeof(Matrix));
 		if(!subm) return NULL;
-		subm->dtype = m->dtype;
 		if(endRow - startRow == 1){
 			subm->dshape.shape[0] = 0;
 			subm->dshape.shape[1] = 0;
@@ -316,56 +345,19 @@ Matrix *getSecondOrderMatrixRows(Matrix *m,int startRow,int endRow){
 		}
 		subm->length = (endRow - startRow)*m->dshape.shape[3];
 		subm->size = subm->length;
-		switch(m->dtype){
-			case d_uchar:
-				subm->array = (unsigned char *)malloc(subm->length*sizeof(unsigned char));
-				break;
-			case d_char:
-				subm->array = (char *)malloc(subm->length*sizeof(char));
-				break;
-			case d_int:
-				subm->array = (int *)malloc(subm->length*sizeof(int));
-				break;
-			case d_uint:
-				subm->array = (unsigned int *)malloc(subm->length*sizeof(unsigned int));
-				break;
-			case d_float:
-				subm->array = (float *)malloc(subm->length*sizeof(float));
-				break;
-			case d_double:
-				subm->array = (double *)malloc(subm->length*sizeof(double));
-				break;
-		}
+		subm->array = (double *)malloc(subm->length*sizeof(double));
 		if(!subm->array){
 			free(subm);
 			return NULL;
 		}
 		for(i=0;i<subm->length;i++){
-			switch(subm->dtype){
-				case d_uchar:
-					*((unsigned char *)subm->array+i) = *((unsigned char *)m->array+startRow*m->dshape.shape[3]+i);
-					break;
-				case d_char:
-					*((char *)subm->array+i) = *((char *)m->array+startRow*m->dshape.shape[3]+i);
-					break;
-				case d_int:
-					*((int *)subm->array+i) = *((int *)m->array+startRow*m->dshape.shape[3]+i);
-					break;
-				case d_uint:
-					*((unsigned int *)subm->array+i) = *((unsigned int *)m->array+startRow*m->dshape.shape[3]+i);
-					break;
-				case d_float:
-					*((float *)subm->array+i) = *((float *)m->array+startRow*m->dshape.shape[3]+i);
-					break;
-				case d_double:
-					*((double *)subm->array+i) = *((double *)m->array+startRow*m->dshape.shape[3]+i);
-					break;
-			}
+			*(subm->array+i) = *(m->array+startRow*m->dshape.shape[3]+i);
 		}
 	}
 	return subm;
 }
 
+//提取二维数组的连续多列，返回一个包含多列内容的子数组
 Matrix *getSecondOrderMatrixColumes(Matrix *m,int startColume,int endColume){
 	int i = 0,j,w,x,y,z;
 	if(!m) return NULL;
@@ -373,7 +365,6 @@ Matrix *getSecondOrderMatrixColumes(Matrix *m,int startColume,int endColume){
 	if(startColume >= 0 || startColume < m->dshape.shape[3] || endColume <= m->dshape.shape[3] || endColume > startColume){
 		subm = (Matrix *)malloc(sizeof(Matrix));
 		if(!subm) return NULL;
-		subm->dtype = m->dtype;
 		subm->dshape.shape[0] = m->dshape.shape[0];
 		subm->dshape.shape[1] = m->dshape.shape[1];
 		subm->dshape.shape[2] = m->dshape.shape[2];
@@ -392,68 +383,21 @@ Matrix *getSecondOrderMatrixColumes(Matrix *m,int startColume,int endColume){
 			subm->length = z;
 		}
 		subm->size = subm->length;
-		switch(m->dtype){
-			case d_uchar:
-				subm->array = (unsigned char *)malloc(subm->length*sizeof(unsigned char));
-				break;
-			case d_char:
-				subm->array = (char *)malloc(subm->length*sizeof(char));
-				break;
-			case d_int:
-				subm->array = (int *)malloc(subm->length*sizeof(int));
-				break;
-			case d_uint:
-				subm->array = (unsigned int *)malloc(subm->length*sizeof(unsigned int));
-				break;
-			case d_float:
-				subm->array = (float *)malloc(subm->length*sizeof(float));
-				break;
-			case d_double:
-				subm->array = (double *)malloc(subm->length*sizeof(double));
-				break;
-		}
+		subm->array = (double *)malloc(subm->length*sizeof(double));
 		if(!subm->array){
 			free(subm);
 			return NULL;
 		}
 		for(i=0;i<subm->length/z;i++){
-			switch(subm->dtype){
-				case d_uchar:
-					for(j=0;j<subm->dshape.shape[3];j++){
-						*((unsigned char *)subm->array+i*z+j) = *((unsigned char *)m->array+i*m->dshape.shape[3]+startColume+j);
-					}
-					break;
-				case d_char:
-					for(j=0;j<subm->dshape.shape[3];j++){
-						*((char *)subm->array+i*z+j) = *((char *)m->array+i*m->dshape.shape[3]+startColume+j);
-					}
-					break;
-				case d_int:
-					for(j=0;j<subm->dshape.shape[3];j++){
-						*((int *)subm->array+i*z+j) = *((int *)m->array+i*m->dshape.shape[3]+startColume+j);
-					}
-					break;
-				case d_uint:
-					for(j=0;j<subm->dshape.shape[3];j++){
-						*((unsigned int *)subm->array+i*z+j) = *((unsigned int *)m->array+i*m->dshape.shape[3]+startColume+j);
-					}
-					break;
-				case d_float:
-					for(j=0;j<subm->dshape.shape[3];j++){
-						*((float *)subm->array+i*z+j) = *((float *)m->array+i*m->dshape.shape[3]+startColume+j);
-					}
-					break;
-				case d_double:
-					for(j=0;j<subm->dshape.shape[3];j++){
-						*((double *)subm->array+i*z+j) = *((double *)m->array+i*m->dshape.shape[3]+startColume+j);
-					}
-					break;
+			for(j=0;j<subm->dshape.shape[3];j++){
+				*(subm->array+i*z+j) = *(m->array+i*m->dshape.shape[3]+startColume+j);
 			}
 		}
 	}
 	return subm;
 }
 
+//从二维数组一个行与列下标为起点，获取其子数组
 Matrix *getSecondOrderSubMatrix(Matrix *m,int startRow,int startColume,int endRow,int endColume){
 	Matrix *m1 = NULL,*m2 = NULL;
 	m1 = getSecondOrderMatrixRows(m,startRow,endRow);
@@ -461,5 +405,16 @@ Matrix *getSecondOrderSubMatrix(Matrix *m,int startRow,int startColume,int endRo
 	destroyMatrix(m1);
 	return m2;
 }
+
+//求解数组乘一个系数
+int kMulMatrix(Matrix *m,double k){
+	int i;
+	if(!m) return -1;
+	for(i=0;i<m->length;i++){
+		*(m->array+i) *= k;
+	}
+	return 0;
+}
+
 
 

@@ -17,7 +17,7 @@ int main(void){
 	Dshape dshape;
 	initDshape(&dshape,a);
 	
-	m = creatMatrix(data,16,dtype,dshape);
+	m = creatMatrixFromDatas(data,16,dtype,dshape);
 	printf("shape : ");
 	printShape(m);
 	printarray(m);
@@ -46,6 +46,12 @@ int main(void){
 	printf("m2 shape : ");
 	printShape(m2);
 	printarray(m2);
+	printf("\n");
+	
+	kMulMatrix(m,2);
+	printf("m shape : ");
+	printShape(m);
+	printarray(m);
 	printf("\n");
 	
 	destroyMatrix(m2);
