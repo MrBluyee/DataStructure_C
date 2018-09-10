@@ -33,7 +33,9 @@ void printarray(Matrix *m);
 double getSecondOrderMatrixTrace(Matrix *m);
 int getMatrixElem(Matrix *m,int dimen0,int dimen1,int dimen2,int dimen3,void *elem);
 Matrix *copyMatrix(Matrix *m);
-Matrix *getMatrixRows(Matrix *m,int startRow,int endRow);
+Matrix *getSecondOrderMatrixRows(Matrix *m,int startRow,int endRow);
+Matrix *getSecondOrderMatrixColumes(Matrix *m,int startColume,int endColume);
+Matrix *getSecondOrderSubMatrix(Matrix *m,int startRow,int startColume,int endRow,int endColume);
 void destroyMatrix(Matrix *m);
 
 #endif

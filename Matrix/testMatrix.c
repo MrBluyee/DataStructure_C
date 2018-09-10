@@ -24,8 +24,31 @@ int main(void){
 	printf("Matrix Trace = %f\n",getSecondOrderMatrixTrace(m));
 	getMatrixElem(m,0,0,2,1,&elem);
 	printf("Elem m[2][1] = %d\n",elem);
+
+	m2 = getSecondOrderMatrixRows(m,1,3);
+	printf("get rows:\n");
+	printf("m2 shape : ");
+	printShape(m2);
+	printarray(m2);
 	printf("\n");
 	
+	destroyMatrix(m2);
+	m2 = getSecondOrderMatrixColumes(m,1,3);
+	printf("get columes:\n");
+	printf("m2 shape : ");
+	printShape(m2);
+	printarray(m2);
+	printf("\n");
+	
+	destroyMatrix(m2);
+	m2 = getSecondOrderSubMatrix(m,1,1,3,3);
+	printf("get sub matrix:\n");
+	printf("m2 shape : ");
+	printShape(m2);
+	printarray(m2);
+	printf("\n");
+	
+	destroyMatrix(m2);
 	m2 = copyMatrix(m);
 	printf("m2 shape : ");
 	printShape(m);
@@ -69,5 +92,6 @@ int main(void){
 	printf("\n");
 	
 	destroyMatrix(m);
+	destroyMatrix(m2);
 	return 0;
 }

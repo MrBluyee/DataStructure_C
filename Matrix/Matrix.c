@@ -294,27 +294,27 @@ Matrix *getSecondOrderMatrixRows(Matrix *m,int startRow,int endRow){
 	int i = 0;
 	if(!m) return NULL;
 	Matrix *subm = NULL;
-	if(m->dshape.sp_length == 1){
+	if(m->dshape.shape[0] == 0 && m->dshape.shape[1] == 0 && m->dshape.shape[2] == 0 && m->dshape.shape[3] != 0){
 		if(startRow != 0 || endRow != 1) return NULL;
+		printf("hello\n");
 		subm = copyMatrix(m);
-	}else if(m->dshape.sp_length == 2){
-		if(startRow < 0 || startRow >= *(m->dshape.shape) || endRow > *(m->dshape.shape) || endRow < startRow) return NULL;
+	}else if(m->dshape.shape[0] == 0 && m->dshape.shape[1] == 0 && m->dshape.shape[2] != 0 && m->dshape.shape[3] != 0){
+		if(startRow < 0 || startRow >= m->dshape.shape[2] || endRow > m->dshape.shape[2] || endRow < startRow) return NULL;
 		subm = (Matrix *)malloc(sizeof(Matrix));
 		if(!subm) return NULL;
 		subm->dtype = m->dtype;
 		if(endRow - startRow == 1){
-			subm->dshape.shape = (int *)malloc(sizeof(int));
-			if(!subm->dshape.shape) return NULL;
-			*(subm->dshape.shape) = *(m->dshape.shape + 1);
-			subm->dshape.sp_length = 1;
+			subm->dshape.shape[0] = 0;
+			subm->dshape.shape[1] = 0;
+			subm->dshape.shape[2] = 0;
+			subm->dshape.shape[3] = m->dshape.shape[3];
 		}else{
-			subm->dshape.shape = (int *)malloc(2*sizeof(int));
-			if(!subm->dshape.shape) return NULL;
-			*(subm->dshape.shape) = endRow - startRow;
-			*(subm->dshape.shape + 1) = *(m->dshape.shape + 1);
-			subm->dshape.sp_length = 2;
+			subm->dshape.shape[0] = 0;
+			subm->dshape.shape[1] = 0;
+			subm->dshape.shape[2] = endRow - startRow;
+			subm->dshape.shape[3] = m->dshape.shape[3];
 		}
-		subm->length = (endRow - startRow)*(*(m->dshape.shape + 1));
+		subm->length = (endRow - startRow)*m->dshape.shape[3];
 		subm->size = subm->length;
 		switch(m->dtype){
 			case d_uchar:
@@ -343,26 +343,123 @@ Matrix *getSecondOrderMatrixRows(Matrix *m,int startRow,int endRow){
 		for(i=0;i<subm->length;i++){
 			switch(subm->dtype){
 				case d_uchar:
-					*((unsigned char *)subm->array+i) = *((unsigned char *)m->array+startRow*(*(m->dshape.shape + 1))+i);
+					*((unsigned char *)subm->array+i) = *((unsigned char *)m->array+startRow*m->dshape.shape[3]+i);
 					break;
 				case d_char:
-					*((char *)subm->array+i) = *((char *)m->array+startRow*(*(m->dshape.shape + 1))+i);
+					*((char *)subm->array+i) = *((char *)m->array+startRow*m->dshape.shape[3]+i);
 					break;
 				case d_int:
-					*((int *)subm->array+i) = *((int *)m->array+startRow*(*(m->dshape.shape + 1))+i);
+					*((int *)subm->array+i) = *((int *)m->array+startRow*m->dshape.shape[3]+i);
 					break;
 				case d_uint:
-					*((unsigned int *)subm->array+i) = *((unsigned int *)m->array+startRow*(*(m->dshape.shape + 1))+i);
+					*((unsigned int *)subm->array+i) = *((unsigned int *)m->array+startRow*m->dshape.shape[3]+i);
 					break;
 				case d_float:
-					*((float *)subm->array+i) = *((float *)m->array+startRow*(*(m->dshape.shape + 1))+i);
+					*((float *)subm->array+i) = *((float *)m->array+startRow*m->dshape.shape[3]+i);
 					break;
 				case d_double:
-					*((double *)subm->array+i) = *((double *)m->array+startRow*(*(m->dshape.shape + 1))+i);
+					*((double *)subm->array+i) = *((double *)m->array+startRow*m->dshape.shape[3]+i);
 					break;
 			}
 		}
 	}
 	return subm;
 }
+
+Matrix *getSecondOrderMatrixColumes(Matrix *m,int startColume,int endColume){
+	int i = 0,j,w,x,y,z;
+	if(!m) return NULL;
+	Matrix *subm = NULL;
+	if(startColume >= 0 || startColume < m->dshape.shape[3] || endColume <= m->dshape.shape[3] || endColume > startColume){
+		subm = (Matrix *)malloc(sizeof(Matrix));
+		if(!subm) return NULL;
+		subm->dtype = m->dtype;
+		subm->dshape.shape[0] = m->dshape.shape[0];
+		subm->dshape.shape[1] = m->dshape.shape[1];
+		subm->dshape.shape[2] = m->dshape.shape[2];
+		subm->dshape.shape[3] = endColume - startColume;
+		z = subm->dshape.shape[3];
+		y = z*subm->dshape.shape[2];
+		x = y*subm->dshape.shape[1];
+		w = x*subm->dshape.shape[0];
+		if(w != 0){
+			subm->length = w;
+		}else if(x != 0){
+			subm->length = x;
+		}else if(y != 0){
+			subm->length = y;
+		}else if(z != 0){
+			subm->length = z;
+		}
+		subm->size = subm->length;
+		switch(m->dtype){
+			case d_uchar:
+				subm->array = (unsigned char *)malloc(subm->length*sizeof(unsigned char));
+				break;
+			case d_char:
+				subm->array = (char *)malloc(subm->length*sizeof(char));
+				break;
+			case d_int:
+				subm->array = (int *)malloc(subm->length*sizeof(int));
+				break;
+			case d_uint:
+				subm->array = (unsigned int *)malloc(subm->length*sizeof(unsigned int));
+				break;
+			case d_float:
+				subm->array = (float *)malloc(subm->length*sizeof(float));
+				break;
+			case d_double:
+				subm->array = (double *)malloc(subm->length*sizeof(double));
+				break;
+		}
+		if(!subm->array){
+			free(subm);
+			return NULL;
+		}
+		for(i=0;i<subm->length/z;i++){
+			switch(subm->dtype){
+				case d_uchar:
+					for(j=0;j<subm->dshape.shape[3];j++){
+						*((unsigned char *)subm->array+i*z+j) = *((unsigned char *)m->array+i*m->dshape.shape[3]+startColume+j);
+					}
+					break;
+				case d_char:
+					for(j=0;j<subm->dshape.shape[3];j++){
+						*((char *)subm->array+i*z+j) = *((char *)m->array+i*m->dshape.shape[3]+startColume+j);
+					}
+					break;
+				case d_int:
+					for(j=0;j<subm->dshape.shape[3];j++){
+						*((int *)subm->array+i*z+j) = *((int *)m->array+i*m->dshape.shape[3]+startColume+j);
+					}
+					break;
+				case d_uint:
+					for(j=0;j<subm->dshape.shape[3];j++){
+						*((unsigned int *)subm->array+i*z+j) = *((unsigned int *)m->array+i*m->dshape.shape[3]+startColume+j);
+					}
+					break;
+				case d_float:
+					for(j=0;j<subm->dshape.shape[3];j++){
+						*((float *)subm->array+i*z+j) = *((float *)m->array+i*m->dshape.shape[3]+startColume+j);
+					}
+					break;
+				case d_double:
+					for(j=0;j<subm->dshape.shape[3];j++){
+						*((double *)subm->array+i*z+j) = *((double *)m->array+i*m->dshape.shape[3]+startColume+j);
+					}
+					break;
+			}
+		}
+	}
+	return subm;
+}
+
+Matrix *getSecondOrderSubMatrix(Matrix *m,int startRow,int startColume,int endRow,int endColume){
+	Matrix *m1 = NULL,*m2 = NULL;
+	m1 = getSecondOrderMatrixRows(m,startRow,endRow);
+	m2 = getSecondOrderMatrixColumes(m1,startColume,endColume);
+	destroyMatrix(m1);
+	return m2;
+}
+
 
