@@ -11,19 +11,18 @@ int main(void){
 	int d[]={0,2,2,4};
 	int e[]={2,2,2,2};
 	
-	int data[] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
-	int elem;
-	Dtype dtype = d_int;
+	double data[] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
+	double elem;
 	Dshape dshape;
 	initDshape(&dshape,a);
 	
-	m = creatMatrixFromDatas(data,16,dtype,dshape);
+	m = creatMatrixFromDatas(data,16,dshape);
 	printf("shape : ");
 	printShape(m);
 	printarray(m);
-	printf("Matrix Trace = %f\n",getSecondOrderMatrixTrace(m));
+	printf("Matrix Trace = %g\n",getSecondOrderMatrixTrace(m));
 	getMatrixElem(m,0,0,2,1,&elem);
-	printf("Elem m[2][1] = %d\n",elem);
+	printf("Elem m[2][1] = %g\n",elem);
 
 	m2 = getSecondOrderMatrixRows(m,1,3);
 	printf("get rows:\n");
@@ -67,7 +66,15 @@ int main(void){
 	printShape(m);
 	printarray(m);
 	getMatrixElem(m,0,0,0,1,&elem);
-	printf("Elem m[0][1] = %d\n",elem);
+	printf("Elem m[0][1] = %g\n",elem);
+	printf("\n");
+	
+	transposeSecondOrderMatrix(m);
+	printf("transpose m:\n");
+	printShape(m);
+	printarray(m);
+	getMatrixElem(m,0,0,0,1,&elem);
+	printf("Elem m[0][1] = %g\n",elem);
 	printf("\n");
 	
 	initDshape(&dshape,c);
@@ -76,7 +83,15 @@ int main(void){
 	printShape(m);
 	printarray(m);
 	getMatrixElem(m,0,0,0,7,&elem);
-	printf("Elem m[7] = %d\n",elem);
+	printf("Elem m[7] = %g\n",elem);
+	printf("\n");
+	
+	transposeSecondOrderMatrix(m);
+	printf("transpose m:\n");
+	printShape(m);
+	printarray(m);
+	getMatrixElem(m,0,0,2,0,&elem);
+	printf("Elem m[2][0] = %g\n",elem);
 	printf("\n");
 	
 	initDshape(&dshape,d);
@@ -85,7 +100,7 @@ int main(void){
 	printShape(m);
 	printarray(m);
 	getMatrixElem(m,0,1,0,3,&elem);
-	printf("Elem m[1][0][3] = %d\n",elem);
+	printf("Elem m[1][0][3] = %g\n",elem);
 	printf("\n");
 	
 	initDshape(&dshape,e);
@@ -94,7 +109,7 @@ int main(void){
 	printShape(m);
 	printarray(m);
 	getMatrixElem(m,1,0,1,1,&elem);
-	printf("Elem m[1][0][1][1] = %d\n",elem);
+	printf("Elem m[1][0][1][1] = %g\n",elem);
 	printf("\n");
 	
 	destroyMatrix(m);

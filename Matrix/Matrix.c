@@ -9,7 +9,6 @@ Matrix *creatMatrixFromDatas(double *data,int data_len, Dshape dshape){
 	Matrix *m = (Matrix *)malloc(sizeof(Matrix));
 	if(!m) return NULL;
 	m->array = (double *)malloc(data_len*sizeof(double));
-	}
 	if(!m->array){
 		free(m);
 		return NULL;
@@ -41,9 +40,7 @@ Matrix *creatMatrixFromValue(double value, Dshape dshape){
 	}
 	Matrix *m = (Matrix *)malloc(sizeof(Matrix));
 	if(!m) return NULL;
-	switch(dtype){
-		m->array = (double *)malloc(data_len*sizeof(double));
-	}
+	m->array = (double *)malloc(data_len*sizeof(double));
 	if(!m->array){
 		free(m);
 		return NULL;
@@ -75,9 +72,7 @@ Matrix *creatMatrixFromArange(double startVal, double stepVal,Dshape dshape){
 	}
 	Matrix *m = (Matrix *)malloc(sizeof(Matrix));
 	if(!m) return NULL;
-	switch(dtype){
-		m->array = (double *)malloc(data_len*sizeof(double));
-	}
+	m->array = (double *)malloc(data_len*sizeof(double));
 	if(!m->array){
 		free(m);
 		return NULL;
@@ -110,9 +105,7 @@ Matrix *creatMatrixFromLinspace(double startVal, double endVal,Dshape dshape){
 	}
 	Matrix *m = (Matrix *)malloc(sizeof(Matrix));
 	if(!m) return NULL;
-	switch(dtype){
-		m->array = (double *)malloc(data_len*sizeof(double));
-	}
+	m->array = (double *)malloc(data_len*sizeof(double));
 	if(!m->array){
 		free(m);
 		return NULL;
@@ -145,9 +138,7 @@ Matrix *creatIdentitySecondOrderMatrix(Dshape dshape){
 	data_len = dshape.shape[2] * dshape.shape[3];
 	Matrix *m = (Matrix *)malloc(sizeof(Matrix));
 	if(!m) return NULL;
-	switch(dtype){
-		m->array = (double *)malloc(data_len*sizeof(double));
-	}
+	m->array = (double *)malloc(data_len*sizeof(double));
 	if(!m->array){
 		free(m);
 		return NULL;
@@ -258,8 +249,7 @@ void printarray(Matrix *m){
 		}else{
 			printf(", ");
 		}
-		printf("%f",*(m->array + i));
-		}
+		printf("%g",*(m->array + i));
 	}
 	for(i=0;i<4;i++){
 		if(m->dshape.shape[i] != 0){
@@ -416,5 +406,53 @@ int kMulMatrix(Matrix *m,double k){
 	return 0;
 }
 
+//转置二维数组
+int transposeSecondOrderMatrix(Matrix *m){
+	int i,j,k=0;
+	Matrix *m1 = copyMatrix(m);
+	if(m1->dshape.shape[2] != 0){ //二维数组
+		m->dshape.shape[2] = m1->dshape.shape[3];
+		m->dshape.shape[3] = m1->dshape.shape[2];
+		for(i=0;i<m1->dshape.shape[3];i++){
+			for(j=0;j<m1->dshape.shape[2];j++){
+				*(m->array+k) = *(m1->array+j*m1->dshape.shape[3]+i);
+				k++;
+			}
+		}
+	}else{ //一维数组
+		m->dshape.shape[2] = m1->dshape.shape[3];
+		m->dshape.shape[3] = 1;
+	}
+	destroyMatrix(m1);
+	return 0;
+}
 
+//交换二维数组的两行
+int swapSecondOrderMatrixRow(Matrix *m, int row1,int row2){
+	
+}
 
+//交换二维数组的两列
+int swapSecondOrderMatrixColume(Matrix *m, int colume1,int colume2){
+	
+}
+
+//二维数组的其中一行乘上一个系数
+int kMulSecondOrderMatrixRow(Matrix *m, int row,double k){
+	
+}
+
+//二维数组的其中一列乘上一个系数
+int kMulSecondOrderMatrixColume(Matrix *m, int colume,double k){
+	
+}
+
+//删除二维数组的连续几行
+int deleteSecondOrderMatrixRows(Matrix *m,int startRow,int endRow){
+	
+}
+
+//删除二维数组的连续几列
+int deleteSecondOrderMatrixColumes(Matrix *m,int startColume,int endColume){
+	
+}
