@@ -39,6 +39,10 @@ int swapSecondOrderMatrixColume(Matrix *m, int colume1,int colume2);
 int kMulMatrix(Matrix *m,double k);
 int kMulSecondOrderMatrixRow(Matrix *m, int row,double k);
 int kMulSecondOrderMatrixColume(Matrix *m, int colume,double k);
+int deleteSecondOrderMatrixRows(Matrix *m,int startRow,int endRow);
+int deleteSecondOrderMatrixColumes(Matrix *m,int startColume,int endColume);
+int spliceSecondOrderMatrixRow(Matrix *m1,Matrix *m2);
+int spliceSecondOrderMatrixColume(Matrix *m1,Matrix *m2);
 void destroyMatrix(Matrix *m);
 
 #endif

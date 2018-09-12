@@ -81,6 +81,34 @@ int main(void){
 	printarray(m2);
 	printf("\n");
 	
+	spliceSecondOrderMatrixRow(m2,m);
+	printf("row append m to m2:\n");
+	printf("m2 shape : ");
+	printShape(m2);
+	printarray(m2);
+	printf("\n");
+	
+	deleteSecondOrderMatrixRows(m2,1,5);
+	printf("delete m2 row 1,5:\n");
+	printf("m2 shape : ");
+	printShape(m2);
+	printarray(m2);
+	printf("\n");
+	
+	spliceSecondOrderMatrixColume(m2,m);
+	printf("Colume append m to m2:\n");
+	printf("m2 shape : ");
+	printShape(m2);
+	printarray(m2);
+	printf("\n");
+	
+	deleteSecondOrderMatrixColumes(m2,2,4);
+	printf("delete m2 columes 2,3:\n");
+	printf("m2 shape : ");
+	printShape(m2);
+	printarray(m2);
+	printf("\n");
+	
 	initDshape(&dshape,b);
 	reshape(m,dshape);
 	printf("shape : ");
