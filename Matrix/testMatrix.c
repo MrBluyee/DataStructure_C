@@ -56,8 +56,29 @@ int main(void){
 	destroyMatrix(m2);
 	m2 = copyMatrix(m);
 	printf("m2 shape : ");
-	printShape(m);
-	printarray(m);
+	printShape(m2);
+	printarray(m2);
+	printf("\n");
+	
+	swapSecondOrderMatrixColume(m2,1,2);
+	printf("swap Colume m:\n");
+	printf("m2 shape : ");
+	printShape(m2);
+	printarray(m2);
+	printf("\n");
+	
+	kMulSecondOrderMatrixRow(m2,2,1.7);
+	printf("1.7 * m2 row2:\n");
+	printf("m2 shape : ");
+	printShape(m2);
+	printarray(m2);
+	printf("\n");	
+	
+	kMulSecondOrderMatrixColume(m2,1,0.3);
+	printf("0.3 * m2 colume1:\n");
+	printf("m2 shape : ");
+	printShape(m2);
+	printarray(m2);
 	printf("\n");
 	
 	initDshape(&dshape,b);
@@ -71,6 +92,12 @@ int main(void){
 	
 	transposeSecondOrderMatrix(m);
 	printf("transpose m:\n");
+	printShape(m);
+	printarray(m);
+	printf("\n");
+	
+	swapSecondOrderMatrixRow(m,1,2);
+	printf("swap row m:\n");
 	printShape(m);
 	printarray(m);
 	getMatrixElem(m,0,0,0,1,&elem);

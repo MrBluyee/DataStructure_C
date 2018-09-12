@@ -34,7 +34,11 @@ Matrix *getSecondOrderMatrixRows(Matrix *m,int startRow,int endRow);
 Matrix *getSecondOrderMatrixColumes(Matrix *m,int startColume,int endColume);
 Matrix *getSecondOrderSubMatrix(Matrix *m,int startRow,int startColume,int endRow,int endColume);
 int transposeSecondOrderMatrix(Matrix *m);
+int swapSecondOrderMatrixRow(Matrix *m, int row1,int row2);
+int swapSecondOrderMatrixColume(Matrix *m, int colume1,int colume2);
 int kMulMatrix(Matrix *m,double k);
+int kMulSecondOrderMatrixRow(Matrix *m, int row,double k);
+int kMulSecondOrderMatrixColume(Matrix *m, int colume,double k);
 void destroyMatrix(Matrix *m);
 
 #endif
