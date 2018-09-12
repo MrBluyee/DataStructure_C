@@ -2,7 +2,20 @@
 #include <malloc.h>
 #include "Matrix.h"
 
-//从连续的数据创建数组
+//从连续的数据创建数组,浅拷贝
+Matrix *creatAsMatrixFromDatas(double *data,int data_len, Dshape dshape){
+	int i = 0; 
+	if(!data) return NULL;
+	Matrix *m = (Matrix *)malloc(sizeof(Matrix));
+	if(!m) return NULL;
+	m->array = data;
+	m->dshape = dshape;
+	m->length = data_len;
+	m->size = data_len;
+	return m;
+}
+
+//从连续的数据创建数组,深拷贝
 Matrix *creatMatrixFromDatas(double *data,int data_len, Dshape dshape){
 	int i = 0; 
 	if(!data) return NULL;

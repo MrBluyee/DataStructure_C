@@ -14,6 +14,7 @@ typedef struct Matrix{
 	int size; //空间大小
 }Matrix;
 
+Matrix *creatAsMatrixFromDatas(double *data,int data_len, Dshape dshape);
 Matrix *creatMatrixFromDatas(double *data,int data_len, Dshape dshape);
 Matrix *creatMatrixFromValue(double value, Dshape dshape);
 Matrix *creatMatrixFromArange(double startVal, double stepVal,Dshape dshape);
