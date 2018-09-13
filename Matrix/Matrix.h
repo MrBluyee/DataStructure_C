@@ -46,6 +46,7 @@ int kMulSecondOrderMatrixRow(Matrix *m, int row,double k);
 int kMulSecondOrderMatrixColume(Matrix *m, int colume,double k);
 int deleteSecondOrderMatrixRows(Matrix *m,int startRow,int endRow);
 int deleteSecondOrderMatrixColumes(Matrix *m,int startColume,int endColume);
+int deleteSecondOrderMatrixRowAndColume(Matrix *m,int row,int colume);
 int spliceSecondOrderMatrixRow(Matrix *m1,Matrix *m2);
 int spliceSecondOrderMatrixColume(Matrix *m1,Matrix *m2);
 int kAddMatrix(Matrix *m,double k);
@@ -56,6 +57,7 @@ Matrix *addSecondOrderMatrixs(Matrix *m1,Matrix *m2);
 Matrix *subSecondOrderMatrixs(Matrix *m1,Matrix *m2);
 Matrix *dotSecondOrderMatrixs(Matrix *m1,Matrix *m2);
 Matrix *mulSecondOrderMatrixs(Matrix *m1,Matrix *m2);
+int detSecondOrderMatrixs(Matrix *m,double *result);
 void destroyMatrix(Matrix *m);
 
 #endif

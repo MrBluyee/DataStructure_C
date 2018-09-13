@@ -186,9 +186,13 @@ void clearMatrix(Matrix *m){
 
 //删除数组，并释放空间
 void destroyMatrix(Matrix *m){
-	free(m->array);
-	m->array = NULL;
-	free(m);
+	if(m){
+		if(m->array){
+			free(m->array);
+			m->array = NULL;
+		}
+		free(m);
+	}
 	m = NULL;
 }
 
@@ -572,6 +576,13 @@ int deleteSecondOrderMatrixColumes(Matrix *m,int startColume,int endColume){
 	return transposeSecondOrderMatrix(m);
 }
 
+//删除二维数组的指定的行和列
+int deleteSecondOrderMatrixRowAndColume(Matrix *m,int row,int colume){
+	if(deleteSecondOrderMatrixColumes(m,colume,colume + 1) == -1) return -1;
+	if(deleteSecondOrderMatrixRows(m,row,row + 1) == -1) return -1;
+	return 0;
+}
+
 //求解数组加上一个系数
 int kAddMatrix(Matrix *m,double k){
 	int i;
@@ -730,9 +741,39 @@ Matrix *mulSecondOrderMatrixs(Matrix *m1,Matrix *m2){
 	return resultm;
 }
 
-//数组的行列式
-Matrix *determinantSecondOrderMatrixs(Matrix *m){
-	
+//使用定义求n阶数组的行列式，要求m为n阶二维方阵，n>=2
+static double DetSecondOrderMatrixs(Matrix *m){
+	if(!m) return -1;
+	if(m->dshape.shape[0] != 0 || m->dshape.shape[1] != 0 || 
+	m->dshape.shape[2] != m->dshape.shape[3] || m->dshape.shape[3] < 2) return -1;
+	printarray(m);
+	if(m->dshape.shape[3] == 2){
+		//递归到一个二维矩阵时可以直接求解行列式
+		return *(m->array + 0*m->dshape.shape[2] + 0) * *(m->array + 1*m->dshape.shape[2] + 1) -
+		*(m->array + 0*m->dshape.shape[2] + 1) * *(m->array + 1*m->dshape.shape[2] + 0);
+	}else{
+		double res = 0;
+		int i;
+		for(i=0;i<m->dshape.shape[2];i++){//为方便编程，每次都由第一行展开
+			int k = 1;
+			if(i % 2 == 1){
+				k = -1;
+			}
+			deleteSecondOrderMatrixRowAndColume(m,1,i + 1);
+			res += *(m->array + i) * k * DetSecondOrderMatrixs(m);
+		}
+		return res;
+	}
+}
+
+//求行列式，保护传入数组m
+int detSecondOrderMatrixs(Matrix *m,double *result){
+	Matrix *copym = NULL;
+	copym = copyMatrix(m);
+	if(!copym) return -1;
+	*result = DetSecondOrderMatrixs(copym);
+	destroyMatrix(copym);
+	return 0;
 }
 
 //求解线性矩阵方程
