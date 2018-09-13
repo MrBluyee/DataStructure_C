@@ -14,6 +14,11 @@ typedef struct Matrix{
 	int size; //空间大小
 }Matrix;
 
+typedef struct MatrixResult{
+	double *array;  
+	int length; //长度
+}MatrixResult;
+
 Matrix *creatAsMatrixFromDatas(double *data,int data_len, Dshape dshape);
 Matrix *creatMatrixFromDatas(double *data,int data_len, Dshape dshape);
 Matrix *creatMatrixFromValue(double value, Dshape dshape);
@@ -37,13 +42,20 @@ Matrix *getSecondOrderSubMatrix(Matrix *m,int startRow,int startColume,int endRo
 int transposeSecondOrderMatrix(Matrix *m);
 int swapSecondOrderMatrixRow(Matrix *m, int row1,int row2);
 int swapSecondOrderMatrixColume(Matrix *m, int colume1,int colume2);
-int kMulMatrix(Matrix *m,double k);
 int kMulSecondOrderMatrixRow(Matrix *m, int row,double k);
 int kMulSecondOrderMatrixColume(Matrix *m, int colume,double k);
 int deleteSecondOrderMatrixRows(Matrix *m,int startRow,int endRow);
 int deleteSecondOrderMatrixColumes(Matrix *m,int startColume,int endColume);
 int spliceSecondOrderMatrixRow(Matrix *m1,Matrix *m2);
 int spliceSecondOrderMatrixColume(Matrix *m1,Matrix *m2);
+int kAddMatrix(Matrix *m,double k);
+int kSubMatrix(Matrix *m,double k);
+int kMulMatrix(Matrix *m,double k);
+int kDivMatrix(Matrix *m,double k);
+Matrix *addSecondOrderMatrixs(Matrix *m1,Matrix *m2);
+Matrix *subSecondOrderMatrixs(Matrix *m1,Matrix *m2);
+Matrix *dotSecondOrderMatrixs(Matrix *m1,Matrix *m2);
+Matrix *mulSecondOrderMatrixs(Matrix *m1,Matrix *m2);
 void destroyMatrix(Matrix *m);
 
 #endif

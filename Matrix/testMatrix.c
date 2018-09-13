@@ -5,6 +5,7 @@
 int main(void){
 	Matrix *m = NULL;
 	Matrix *m2 = NULL;
+	Matrix *m3 = NULL;
 	int a[]={0,0,4,4};
 	int b[]={0,0,2,8};
 	int c[]={0,0,0,16};
@@ -61,7 +62,7 @@ int main(void){
 	printf("\n");
 	
 	swapSecondOrderMatrixColume(m2,1,2);
-	printf("swap Colume m:\n");
+	printf("swap Colume m2:\n");
 	printf("m2 shape : ");
 	printShape(m2);
 	printarray(m2);
@@ -101,6 +102,13 @@ int main(void){
 	printShape(m2);
 	printarray(m2);
 	printf("\n");
+	
+	m3 = mulSecondOrderMatrixs(m,m2);
+	printf("m3 =  m X m2:\n");
+	printf("m3 shape : ");
+	printShape(m3);
+	printarray(m3);
+	printf("\n");	
 	
 	deleteSecondOrderMatrixColumes(m2,2,4);
 	printf("delete m2 columes 2,3:\n");
@@ -169,5 +177,6 @@ int main(void){
 	
 	destroyMatrix(m);
 	destroyMatrix(m2);
+	destroyMatrix(m3);
 	return 0;
 }
