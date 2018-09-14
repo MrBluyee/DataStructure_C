@@ -462,6 +462,15 @@ Matrix *getSecondOrderSubMatrix(Matrix *m,int startRow,int startColume,int endRo
 	return m2;
 }
 
+//提取二维数组删除指定行和列后的子数组
+Matrix *getSecondOrderLeftSubMatrix(Matrix *m,int row,int colume){
+	Matrix *copym = NULL;
+	copym = copyMatrix(m);
+	if(!copym) return NULL;
+	if(deleteSecondOrderMatrixRowAndColume(copym,row,colume) == -1) return NULL;
+	return copym;
+}
+
 //转置二维数组
 int transposeSecondOrderMatrix(Matrix *m){
 	int i,j,k=0;
@@ -516,6 +525,42 @@ int swapSecondOrderMatrixColume(Matrix *m, int colume1,int colume2){
 	return 0;
 }
 
+//二维数组的其中一行加上一个系数
+int kAddSecondOrderMatrixRow(Matrix *m, int row,double k){
+	int i;
+	if(!m) return -1;
+	if(m->dshape.shape[2] == 0){//一维数组
+		if(row != 0) return -1;
+		for(i=0;i<m->dshape.shape[3];i++){
+			*(m->array+i) *= k;
+		}
+	}else{
+		if(row < 0 || row >= m->dshape.shape[2]) return -1;
+		for(i=0;i<m->dshape.shape[3];i++){
+			*(m->array+row*m->dshape.shape[3]+i) += k;
+		}
+	}
+	return 0;
+}
+
+//二维数组的其中一行减去一个系数
+int kSubSecondOrderMatrixRow(Matrix *m, int row,double k){
+	int i;
+	if(!m) return -1;
+	if(m->dshape.shape[2] == 0){//一维数组
+		if(row != 0) return -1;
+		for(i=0;i<m->dshape.shape[3];i++){
+			*(m->array+i) *= k;
+		}
+	}else{
+		if(row < 0 || row >= m->dshape.shape[2]) return -1;
+		for(i=0;i<m->dshape.shape[3];i++){
+			*(m->array+row*m->dshape.shape[3]+i) -= k;
+		}
+	}
+	return 0;
+}
+
 //二维数组的其中一行乘上一个系数
 int kMulSecondOrderMatrixRow(Matrix *m, int row,double k){
 	int i;
@@ -534,6 +579,98 @@ int kMulSecondOrderMatrixRow(Matrix *m, int row,double k){
 	return 0;
 }
 
+//二维数组的其中一行除以一个系数
+int kDivSecondOrderMatrixRow(Matrix *m, int row,double k){
+	int i;
+	if(!m) return -1;
+	if(m->dshape.shape[2] == 0){//一维数组
+		if(row != 0) return -1;
+		for(i=0;i<m->dshape.shape[3];i++){
+			*(m->array+i) *= k;
+		}
+	}else{
+		if(row < 0 || row >= m->dshape.shape[2]) return -1;
+		for(i=0;i<m->dshape.shape[3];i++){
+			*(m->array+row*m->dshape.shape[3]+i) /= k;
+		}
+	}
+	return 0;
+}
+
+//二维数组的其中一行加上另外一行,row1 = row1+row2
+int addSecondOrderMatrixRows(Matrix *m, int row1,int row2){
+	int i;
+	if(!m) return -1;
+	if(m->dshape.shape[2] == 0) return -1;
+	if(row1 < 0 || row1 >= m->dshape.shape[2] || 
+	row2 < 0 || row2 >= m->dshape.shape[2] || row1 == row2) return -1;
+	for(i=0;i<m->dshape.shape[3];i++){
+		*(m->array+row1*m->dshape.shape[3]+i) += *(m->array+row2*m->dshape.shape[3]+i);
+	}
+	return 0;
+}
+
+//二维数组的其中一行减去另外一行,row1 = row1-row2
+int subSecondOrderMatrixRows(Matrix *m, int row1,int row2){
+	int i;
+	if(!m) return -1;
+	if(m->dshape.shape[2] == 0) return -1;
+	if(row1 < 0 || row1 >= m->dshape.shape[2] || 
+	row2 < 0 || row2 >= m->dshape.shape[2] || row1 == row2) return -1;
+	for(i=0;i<m->dshape.shape[3];i++){
+		*(m->array+row1*m->dshape.shape[3]+i) -= *(m->array+row2*m->dshape.shape[3]+i);
+	}
+	return 0;
+}
+
+//二维数组的其中一行乘上另外一行，对应相乘,row1 = row1*row2
+int mulSecondOrderMatrixRows(Matrix *m, int row1,int row2){
+	int i;
+	if(!m) return -1;
+	if(m->dshape.shape[2] == 0) return -1;
+	if(row1 < 0 || row1 >= m->dshape.shape[2] || 
+	row2 < 0 || row2 >= m->dshape.shape[2] || row1 == row2) return -1;
+	for(i=0;i<m->dshape.shape[3];i++){
+		*(m->array+row1*m->dshape.shape[3]+i) *= *(m->array+row2*m->dshape.shape[3]+i);
+	}
+	return 0;
+}
+
+//二维数组的其中一行除以另外一行，对应相除,row1 = row1/row2
+int divSecondOrderMatrixRows(Matrix *m, int row1,int row2){
+	int i;
+	if(!m) return -1;
+	if(m->dshape.shape[2] == 0) return -1;
+	if(row1 < 0 || row1 >= m->dshape.shape[2] || 
+	row2 < 0 || row2 >= m->dshape.shape[2] || row1 == row2) return -1;
+	for(i=0;i<m->dshape.shape[3];i++){
+		*(m->array+row1*m->dshape.shape[3]+i) /= *(m->array+row2*m->dshape.shape[3]+i);
+	}
+	return 0;
+}
+
+//二维数组的其中一列加上一个系数
+int kAddSecondOrderMatrixColume(Matrix *m, int colume,double k){
+	int i;
+	if(!m) return -1;
+	if(colume < 0 || colume >= m->dshape.shape[3]) return -1;
+	for(i=0;i<m->length/m->dshape.shape[3];i++){
+		*(m->array+i*m->dshape.shape[3]+colume) += k;
+	}
+	return 0;
+}
+
+//二维数组的其中一列减去一个系数
+int kSubSecondOrderMatrixColume(Matrix *m, int colume,double k){
+	int i;
+	if(!m) return -1;
+	if(colume < 0 || colume >= m->dshape.shape[3]) return -1;
+	for(i=0;i<m->length/m->dshape.shape[3];i++){
+		*(m->array+i*m->dshape.shape[3]+colume) -= k;
+	}
+	return 0;
+}
+
 //二维数组的其中一列乘上一个系数
 int kMulSecondOrderMatrixColume(Matrix *m, int colume,double k){
 	int i;
@@ -541,6 +678,65 @@ int kMulSecondOrderMatrixColume(Matrix *m, int colume,double k){
 	if(colume < 0 || colume >= m->dshape.shape[3]) return -1;
 	for(i=0;i<m->length/m->dshape.shape[3];i++){
 		*(m->array+i*m->dshape.shape[3]+colume) *= k;
+	}
+	return 0;
+}
+
+//二维数组的其中一列除以一个系数
+int kDivSecondOrderMatrixColume(Matrix *m, int colume,double k){
+	int i;
+	if(!m) return -1;
+	if(colume < 0 || colume >= m->dshape.shape[3]) return -1;
+	for(i=0;i<m->length/m->dshape.shape[3];i++){
+		*(m->array+i*m->dshape.shape[3]+colume) /= k;
+	}
+	return 0;
+}
+
+//二维数组的其中一列加上另外一列,colume1 = colume1 + colume2
+int addSecondOrderMatrixColumes(Matrix *m, int colume1, int colume2){
+	int i;
+	if(!m) return -1;
+	if(colume1 < 0 || colume1 >= m->dshape.shape[3] || colume2 < 0 || 
+	colume2 >= m->dshape.shape[3] || colume1 == colume2) return -1;
+	for(i=0;i<m->length/m->dshape.shape[3];i++){
+		*(m->array+i*m->dshape.shape[3]+colume1) += *(m->array+i*m->dshape.shape[3]+colume2);
+	}
+	return 0;
+}
+
+//二维数组的其中一列减去另外一列,colume1 = colume1 - colume2
+int subSecondOrderMatrixColumes(Matrix *m, int colume1, int colume2){
+	int i;
+	if(!m) return -1;
+	if(colume1 < 0 || colume1 >= m->dshape.shape[3] || colume2 < 0 || 
+	colume2 >= m->dshape.shape[3] || colume1 == colume2) return -1;
+	for(i=0;i<m->length/m->dshape.shape[3];i++){
+		*(m->array+i*m->dshape.shape[3]+colume1) -= *(m->array+i*m->dshape.shape[3]+colume2);
+	}
+	return 0;
+}
+
+//二维数组的其中一列乘上另外一列,对应相乘,colume1 = colume1 * colume2
+int mulSecondOrderMatrixColumes(Matrix *m, int colume1, int colume2){
+	int i;
+	if(!m) return -1;
+	if(colume1 < 0 || colume1 >= m->dshape.shape[3] || colume2 < 0 || 
+	colume2 >= m->dshape.shape[3] || colume1 == colume2) return -1;
+	for(i=0;i<m->length/m->dshape.shape[3];i++){
+		*(m->array+i*m->dshape.shape[3]+colume1) *= *(m->array+i*m->dshape.shape[3]+colume2);
+	}
+	return 0;
+}
+
+//二维数组的其中一列除以另外一列,对应相乘,colume1 = colume1 / colume2
+int divSecondOrderMatrixColumes(Matrix *m, int colume1, int colume2){
+	int i;
+	if(!m) return -1;
+	if(colume1 < 0 || colume1 >= m->dshape.shape[3] || colume2 < 0 || 
+	colume2 >= m->dshape.shape[3] || colume1 == colume2) return -1;
+	for(i=0;i<m->length/m->dshape.shape[3];i++){
+		*(m->array+i*m->dshape.shape[3]+colume1) /= *(m->array+i*m->dshape.shape[3]+colume2);
 	}
 	return 0;
 }
@@ -742,11 +938,10 @@ Matrix *mulSecondOrderMatrixs(Matrix *m1,Matrix *m2){
 }
 
 //使用定义求n阶数组的行列式，要求m为n阶二维方阵，n>=2
-static double DetSecondOrderMatrixs(Matrix *m){
+static double DetSquareMatrixs(Matrix *m){
 	if(!m) return -1;
 	if(m->dshape.shape[0] != 0 || m->dshape.shape[1] != 0 || 
 	m->dshape.shape[2] != m->dshape.shape[3] || m->dshape.shape[3] < 2) return -1;
-	printarray(m);
 	if(m->dshape.shape[3] == 2){
 		//递归到一个二维矩阵时可以直接求解行列式
 		return *(m->array + 0*m->dshape.shape[2] + 0) * *(m->array + 1*m->dshape.shape[2] + 1) -
@@ -756,32 +951,106 @@ static double DetSecondOrderMatrixs(Matrix *m){
 		int i;
 		for(i=0;i<m->dshape.shape[2];i++){//为方便编程，每次都由第一行展开
 			int k = 1;
+			Matrix *subm = NULL; 
 			if(i % 2 == 1){
 				k = -1;
 			}
-			deleteSecondOrderMatrixRowAndColume(m,1,i + 1);
-			res += *(m->array + i) * k * DetSecondOrderMatrixs(m);
+			subm = getSecondOrderLeftSubMatrix(m,0,i);//获取剩下的n-1阶矩阵
+			res += *(m->array + i) * k * DetSquareMatrixs(subm);
+			destroyMatrix(subm);
 		}
 		return res;
 	}
 }
 
 //求行列式，保护传入数组m
-int detSecondOrderMatrixs(Matrix *m,double *result){
+int detSquareMatrixs(Matrix *m,double *result){
 	Matrix *copym = NULL;
 	copym = copyMatrix(m);
 	if(!copym) return -1;
-	*result = DetSecondOrderMatrixs(copym);
+	*result = DetSquareMatrixs(copym);
 	destroyMatrix(copym);
 	return 0;
 }
 
-//求解线性矩阵方程
-Matrix *solveSecondOrderMatrixs(Matrix *m){
-	
+//求二维方阵中指定元素的代数余子式，要求m为n阶二维方阵，n>=2
+int getSquareMatrixElemAlgebraicComplement(Matrix *m,int row,int colume,double *result){
+	if(!m) return -1;
+	if(m->dshape.shape[0] != 0 || m->dshape.shape[1] != 0 || 
+	m->dshape.shape[2] != m->dshape.shape[3] || m->dshape.shape[3] < 2) return -1;
+	if(row < 0 || row >= m->dshape.shape[2] || 
+	colume < 0 || colume >= m->dshape.shape[3]) return -1;
+	Matrix *subm = NULL;
+	subm = getSecondOrderLeftSubMatrix(m,row,colume);
+	if(detSquareMatrixs(subm,result) == -1){
+		destroyMatrix(subm);
+		return -1;
+	}
+	if((row+colume)%2 == 1){
+		*result *= -1;
+	}
+	destroyMatrix(subm);
+	return 0;
 }
 
-//寻找矩阵的乘法逆矩阵
-Matrix *invSecondOrderMatrixs(Matrix *m){
+//求二维方阵中指定一行元素的代数余子式，要求m为n阶二维方阵，n>=2
+Matrix *getSquareMatrixRawAlgebraicComplement(Matrix *m,int row){
+	int i;
+	double temp;
+	if(!m) return NULL;
+	if(m->dshape.shape[0] != 0 || m->dshape.shape[1] != 0 || 
+	m->dshape.shape[2] != m->dshape.shape[3] || m->dshape.shape[3] < 2) return NULL;
+	if(row < 0 || row >= m->dshape.shape[2]) return NULL;
+	Matrix *resultm = (Matrix *)malloc(sizeof(Matrix));
+	if(!resultm) return NULL;
+	resultm->size = m->dshape.shape[3];
+	resultm->length = resultm->size;
+	resultm->dshape.shape[0] = 0;
+	resultm->dshape.shape[1] = 0;
+	resultm->dshape.shape[2] = 0;
+	resultm->dshape.shape[3] = m->dshape.shape[3];
+	resultm->array = (double *)malloc(resultm->size*sizeof(double));
+	if(!resultm->array){
+		free(resultm);
+		return NULL;
+	}
+	for(i=0;i<m->dshape.shape[3];i++){
+		getSquareMatrixElemAlgebraicComplement(m,row,i,&temp);
+		*(resultm->array + i) = temp;
+	}
+	return resultm;
+}
+
+//求二维方阵的伴随矩阵，要求m为n阶二维方阵，n>=2
+Matrix *getSquareMatrixAdjointMatrix(Matrix *m){
+	int i;
+	if(!m) return NULL;
+	if(m->dshape.shape[0] != 0 || m->dshape.shape[1] != 0 || 
+	m->dshape.shape[2] != m->dshape.shape[3] || m->dshape.shape[3] < 2) return NULL;
+	Matrix *resultm = getSquareMatrixRawAlgebraicComplement(m,0);
+	for(i=1;i<m->dshape.shape[2];i++){
+		Matrix *tempm = NULL;
+		tempm = getSquareMatrixRawAlgebraicComplement(m,i);
+		spliceSecondOrderMatrixRow(resultm,tempm);
+		destroyMatrix(tempm);
+	}
+	transposeSecondOrderMatrix(resultm);
+	return resultm;
+}
+
+//寻找方阵的乘法逆矩阵
+Matrix *invSquareMatrixs(Matrix *m){
+	double det_m = 0;
+	Matrix *resultm = NULL;
+	if(detSquareMatrixs(m,&det_m) == -1) return NULL;
+	if(det_m == 0) return NULL; //可逆矩阵行列式不为0
+	resultm = getSquareMatrixAdjointMatrix(m);//求伴随矩阵
+	if(!resultm) return NULL;
+	if(kDivMatrix(resultm,det_m) == -1) return NULL;//逆矩阵=伴随矩阵/行列式
+	return resultm;
+}
+
+//求解线性矩阵方程
+Matrix *solveSecondOrderMatrixs(Matrix *m){
 	
 }

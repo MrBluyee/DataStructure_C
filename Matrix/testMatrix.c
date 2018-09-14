@@ -20,8 +20,22 @@ int main(void){
 	printf("m Trace = %g\n",getSecondOrderMatrixTrace(m));
 	getMatrixElem(m,0,0,2,1,&elem);
 	printf("Elem m[2][1] = %g\n",elem);
-	detSecondOrderMatrixs(m,&elem);
+	detSquareMatrixs(m,&elem);
 	printf("m determinant = %g\n",elem);
+	getSquareMatrixElemAlgebraicComplement(m,0,2,&elem);
+	printf("AlgebraicComplement = %g\n",elem);
+	printf("\n");
+	
+	m2 = getSquareMatrixAdjointMatrix(m);
+	printf("Adjoint Matrix m shape: ");
+	printShape(m2);
+	printarray(m2);
+	printf("\n");
+	
+	m3 = invSquareMatrixs(m);
+	printf("inv m shape: ");
+	printShape(m3);
+	printarray(m3);
 	printf("\n");
 	
 	destroyMatrix(m);
