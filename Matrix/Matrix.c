@@ -1050,16 +1050,82 @@ Matrix *invSquareMatrix(Matrix *m){
 	return resultm;
 }
 
-//求二维矩阵的最简阶梯阵
+//求m x n二维矩阵的最简阶梯阵,内部使用
+static int GetEchelonMatrix(Matrix *m){
+	int i,j;
+	if(!m) return -1;
+	if(m->dshape.shape[2] == 0) return -1;
+	for(i=0;i<m->dshape.shape[2]-1;i++){
+		if(i >= m->dshape.shape[3]) break; //m>n的情况
+		for(j=i+1;j<m->dshape.shape[2];j++){ //保证第一个元素不是0
+			if(*(m->array + i*m->dshape.shape[3] + i) == 0 && *(m->array + j*m->dshape.shape[3] + i) != 0){
+				swapSecondOrderMatrixRow(m,i,j); //交换两行
+				break;
+			}
+		}
+		for(j=i+1;j<m->dshape.shape[2];j++){ //高斯消元法
+			double temp = *(m->array + j*m->dshape.shape[3] + i);
+			if(temp != 0){
+				kMulSecondOrderMatrixRow(m,j,*(m->array + i*m->dshape.shape[3] + i)); 
+				kMulSecondOrderMatrixRow(m,i,temp); 
+				subSecondOrderMatrixRows(m,j,i);
+				kDivSecondOrderMatrixRow(m,i,temp);
+			}
+		}
+	}
+	for(i=m->dshape.shape[2]-1;i>=0;i--){
+		for(j=i-1;j>=0;j--){ //高斯消元法
+			double tempi = *(m->array + i*m->dshape.shape[3] + i);
+			double tempj = *(m->array + j*m->dshape.shape[3] + i);
+			if(tempi != 0 && tempj != 0){
+				kMulSecondOrderMatrixRow(m,j,tempi); 
+				kMulSecondOrderMatrixRow(m,i,tempj); 
+				subSecondOrderMatrixRows(m,j,i);
+				kDivSecondOrderMatrixRow(m,i,tempj);
+			}
+		}
+	}
+	for(i=0;i<m->dshape.shape[2];i++){ //每行首个非0元素置为1
+		if(*(m->array + i*m->dshape.shape[3] + i) != 0){
+			kDivSecondOrderMatrixRow(m,i,*(m->array + i*m->dshape.shape[3] + i));
+		}
+	}
+	return 0;
+}
+
+//求二维矩阵的最简行阶梯阵
 Matrix *getEchelonMatrix(Matrix *m){
-	if(!m) return NULL;
-	if(m->dshape.shape[2] == 0) return NULL;
-	
+	Matrix *copym = NULL;
+	copym = copyMatrix(m);
+	if(!copym) return NULL;
+	if(GetEchelonMatrix(copym) == -1){
+		destroyMatrix(copym);
+		return NULL;
+	}else{
+		return copym;
+	}
 }
 
 //求二维矩阵的秩
-int getSecondOrderMatrixRank(Matrix *m){
-	
+int getSecondOrderMatrixRank(Matrix *m ,int *rank){
+	int i,j,zerocount = 0,zerorow = 0;
+	Matrix *tempm = NULL;
+	tempm = getEchelonMatrix(m);
+	if(!tempm) return -1;
+	for(i=0;i<tempm->dshape.shape[2];i++){
+		zerocount = 0;
+		for(j=0;j<tempm->dshape.shape[3];j++){
+			if(*(tempm->array + i*tempm->dshape.shape[3] + j) == 0){
+				zerocount ++;
+			}
+		}
+		if(zerocount == tempm->dshape.shape[3]){
+			zerorow ++;
+		}
+	}
+	*rank = tempm->dshape.shape[2] - zerorow;
+	destroyMatrix(tempm);
+	return 0;
 }
 
 //求解线性矩阵方程

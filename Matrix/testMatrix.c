@@ -6,35 +6,20 @@ int main(void){
 	Matrix *m = NULL;
 	Matrix *m2 = NULL;
 	Matrix *m3 = NULL;
-	int a[]={0,0,3,3};
-
-	double data[] = {1,2,3,3,4,6,4,6,5};
+	int rank = 0;
+	int a[]={0,0,3,4};
+	int b[]={0,0,4,3};
+	
+	//double data[] = {1,2,3,3,4,6,4,6,5};
+	double data[] = {1,2,3,4,5,6,7,8,9,10,11,12};
 	double elem;
 	Dshape dshape;
-	initDshape(&dshape,a);
+	initDshape(&dshape,b);
 	
-	m = creatMatrixFromDatas(data,9,dshape);
-	printf("m shape: ");
-	printShape(m);
-	printarray(m);
-	printf("m Trace = %g\n",getSecondOrderMatrixTrace(m));
-	getMatrixElem(m,0,0,2,1,&elem);
-	printf("Elem m[2][1] = %g\n",elem);
-	detSquareMatrixs(m,&elem);
-	printf("m determinant = %g\n",elem);
-	printf("\n");
+	m = creatMatrixFromDatas(data,12,dshape);
 	
-	m2 = getSquareMatrixAdjointMatrix(m);
-	printf("Adjoint Matrix m shape: ");
-	printShape(m2);
-	printarray(m2);
-	printf("\n");
-	
-	m3 = invSquareMatrixs(m);
-	printf("inv m shape: ");
-	printShape(m3);
-	printarray(m3);
-	printf("\n");
+	getSecondOrderMatrixRank(m ,&rank);
+	printf("m rank = %d\n",rank);
 	
 	destroyMatrix(m);
 	destroyMatrix(m2);

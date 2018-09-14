@@ -77,6 +77,8 @@ int getSquareMatrixElemAlgebraicComplement(Matrix *m,int row,int colume,double *
 Matrix *getSquareMatrixRawAlgebraicComplement(Matrix *m,int row);
 Matrix *getSquareMatrixAdjointMatrix(Matrix *m);
 Matrix *invSquareMatrix(Matrix *m);
+Matrix *getEchelonMatrix(Matrix *m);
+int getSecondOrderMatrixRank(Matrix *m ,int *rank);
 void destroyMatrix(Matrix *m);
 
 #endif
