@@ -22,8 +22,6 @@ int main(void){
 	printf("Elem m[2][1] = %g\n",elem);
 	detSquareMatrixs(m,&elem);
 	printf("m determinant = %g\n",elem);
-	getSquareMatrixElemAlgebraicComplement(m,0,2,&elem);
-	printf("AlgebraicComplement = %g\n",elem);
 	printf("\n");
 	
 	m2 = getSquareMatrixAdjointMatrix(m);

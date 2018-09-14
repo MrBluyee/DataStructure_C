@@ -1039,7 +1039,7 @@ Matrix *getSquareMatrixAdjointMatrix(Matrix *m){
 }
 
 //寻找方阵的乘法逆矩阵
-Matrix *invSquareMatrixs(Matrix *m){
+Matrix *invSquareMatrix(Matrix *m){
 	double det_m = 0;
 	Matrix *resultm = NULL;
 	if(detSquareMatrixs(m,&det_m) == -1) return NULL;
@@ -1050,7 +1050,19 @@ Matrix *invSquareMatrixs(Matrix *m){
 	return resultm;
 }
 
+//求二维矩阵的最简阶梯阵
+Matrix *getEchelonMatrix(Matrix *m){
+	if(!m) return NULL;
+	if(m->dshape.shape[2] == 0) return NULL;
+	
+}
+
+//求二维矩阵的秩
+int getSecondOrderMatrixRank(Matrix *m){
+	
+}
+
 //求解线性矩阵方程
-Matrix *solveSecondOrderMatrixs(Matrix *m){
+Matrix *solveSecondOrderMatrix(Matrix *m){
 	
 }

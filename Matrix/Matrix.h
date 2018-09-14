@@ -76,7 +76,7 @@ int detSquareMatrixs(Matrix *m,double *result);
 int getSquareMatrixElemAlgebraicComplement(Matrix *m,int row,int colume,double *result);
 Matrix *getSquareMatrixRawAlgebraicComplement(Matrix *m,int row);
 Matrix *getSquareMatrixAdjointMatrix(Matrix *m);
-Matrix *invSquareMatrixs(Matrix *m);
+Matrix *invSquareMatrix(Matrix *m);
 void destroyMatrix(Matrix *m);
 
 #endif
