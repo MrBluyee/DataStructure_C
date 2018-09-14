@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <malloc.h>
+#include <math.h>
 #include "Matrix.h"
 
 //从连续的数据创建数组,浅拷贝
@@ -1131,4 +1132,93 @@ int getSecondOrderMatrixRank(Matrix *m ,int *rank){
 //求解线性矩阵方程
 Matrix *solveSecondOrderMatrix(Matrix *m){
 	
+}
+
+//求矩阵的无穷范数,每一行上的元素绝对值求和，再从中取最大的
+double getMatrixInfNorm(Matrix *m){
+	int i,j;
+	double count1=0,count2=0;
+	if(!m) return -1;
+	if(m->dshape.shape[2] == 0){
+		m->dshape.shape[2] = 1;
+	}
+	for(i=0;i<m->dshape.shape[2];i++){
+		count1=0;
+		for(j=0;j<m->dshape.shape[3];j++){
+			if(*(m->array + i*m->dshape.shape[3] + j) > 0){
+				count1 += *(m->array + i*m->dshape.shape[3] + j);
+			}else{
+				count1 -= *(m->array + i*m->dshape.shape[3] + j);
+			}
+		}
+		if(count1 > count2){
+			count2 = count1;
+		}
+	}
+	if(m->dshape.shape[2] == 1){
+		m->dshape.shape[2] = 0;
+	}
+	return count2;
+}
+
+//求矩阵的L0范数,非0元素的个数
+double getMatrixL0Norm(Matrix *m){
+	int i;
+	double count = 0;
+	if(!m) return -1;
+	for(i=0;i<m->length;i++){
+		if(*(m->array + i) != 0){
+			count += 1;
+		}
+	}
+	return count;
+}
+
+//求矩阵的L1范数，每个元素绝对值之和
+double getMatrixL1Norm(Matrix *m){
+	int i;
+	double count=0;
+	if(!m) return -1;
+	for(i=0;i<m->length;i++){
+		if(*(m->array + i) > 0){
+			count += *(m->array + i);
+		}else{
+			count -= *(m->array + i);
+		}
+	}
+	return count;
+}
+
+//求矩阵的L2范数,各元素平方之和再开平方根
+double getMatrixL2Norm(Matrix *m){
+	int i;
+	double count=0;
+	if(!m) return -1;
+	for(i=0;i<m->length;i++){
+		count += pow(*(m->array + i),2);
+	}
+	count = sqrt(count);
+	return count;
+}
+
+//求矩阵的L21范数,先求各列的L2范数，再将得到的结果求L1范数
+double getMatrixL21Norm(Matrix *m){
+	int i,j;
+	double count1=0,count2=0;
+	if(!m) return -1;
+	if(m->dshape.shape[2] == 0){
+		m->dshape.shape[2] = 1;
+	}
+	for(i=0;i<m->dshape.shape[3];i++){
+		count1=0;
+		for(j=0;j<m->dshape.shape[2];j++){
+			count1 += pow(*(m->array + j*m->dshape.shape[3] + i),2);
+		}
+		count1 = sqrt(count1);
+		count2 += count1;
+	}
+	if(m->dshape.shape[2] == 1){
+		m->dshape.shape[2] = 0;
+	}
+	return count2;
 }

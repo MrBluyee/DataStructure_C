@@ -79,6 +79,11 @@ Matrix *getSquareMatrixAdjointMatrix(Matrix *m);
 Matrix *invSquareMatrix(Matrix *m);
 Matrix *getEchelonMatrix(Matrix *m);
 int getSecondOrderMatrixRank(Matrix *m ,int *rank);
+double getMatrixInfNorm(Matrix *m);
+double getMatrixL0Norm(Matrix *m);
+double getMatrixL1Norm(Matrix *m);
+double getMatrixL2Norm(Matrix *m);
+double getMatrixL21Norm(Matrix *m);
 void destroyMatrix(Matrix *m);
 
 #endif
