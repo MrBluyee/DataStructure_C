@@ -8,28 +8,28 @@ int main(void){
 	Matrix *m3 = NULL;
 	int rank = 0;
 	double norm = 0;
-	int a[]={0,0,2,3};
-	int b[]={0,0,4,3};
+	int a[]={0,0,4,5};
+	int b[]={0,0,4,1};
 	
-	//double data[] = {1,2,3,3,4,6,4,6,5};
-	double data[] = {-1,2,-3,4,-6,6};
+	double data[] = {1,3,3,-2,1,2,6,1,-3,0,1,3,-2,-1,-1,3,9,4,-5,1};
+	double data2[] = {3,2,-1,5};
 	double elem;
 	Dshape dshape;
 	initDshape(&dshape,a);
 	
-	m = creatMatrixFromDatas(data,6,dshape);
-	
-	norm = getMatrixInfNorm(m);
-	printf("m Inf norm = %g\n",norm);
-	norm = getMatrixL0Norm(m);
-	printf("m L0 norm = %g\n",norm);
-	norm = getMatrixL1Norm(m);
-	printf("m L1 norm = %g\n",norm);
-	norm = getMatrixL2Norm(m);
-	printf("m L2 norm = %g\n",norm);
-	norm = getMatrixL21Norm(m);
-	printf("m L21 norm = %g\n",norm);
-	
+	m = creatMatrixFromDatas(data,20,dshape);
+	printarray(m);
+	printf("\n");
+
+	initDshape(&dshape,b);
+	m2 = creatMatrixFromDatas(data2,4,dshape);
+	printarray(m2);
+	printf("\n");
+
+	m3 = solveNonHomoLinearEquations(m, m2);
+	//m3 = solveHomoLinearEquations(m);
+	printarray(m3);
+
 	destroyMatrix(m);
 	destroyMatrix(m2);
 	destroyMatrix(m3);

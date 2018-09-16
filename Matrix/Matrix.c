@@ -145,6 +145,7 @@ Matrix *creatOnesMatrix(Dshape dshape){
 	return creatMatrixFromValue(1, dshape);
 }
 
+
 //创建二维单位阵
 Matrix *creatIdentitySecondOrderMatrix(Dshape dshape){
 	if(dshape.shape[0] != 0 || dshape.shape[1] != 0 || 
@@ -349,6 +350,25 @@ int getMatrixElem(Matrix *m,int dimen0,int dimen1,int dimen2,int dimen3,double *
 	w = m->dshape.shape[0] * x;
 	index = dimen0*x + dimen1*y + dimen2*z + dimen3;
 	*elem = *(m->array + index);
+	return 0;
+}
+
+int modifyMatrixElem(Matrix *m,int dimen0,int dimen1,int dimen2,int dimen3,double elem){
+	int w,x,y,z,index;
+	if(!m) return -1;
+	if((dimen0 != 0 && m->dshape.shape[0] == 0) || 
+	(dimen1 != 0 && m->dshape.shape[1] == 0)) return -1;
+	if((dimen2 != 0 && m->dshape.shape[2] == 0) || 
+	dimen3 >= m->dshape.shape[3]) return -1;
+	if(dimen0 > m->dshape.shape[0] || dimen1 > m->dshape.shape[1] || 
+	dimen2 > m->dshape.shape[2]) return -1;
+	if(dimen0 < 0 || dimen1 < 0 || dimen2 < 0 || dimen3 < 0)return -1;
+	z = m->dshape.shape[3];
+	y = m->dshape.shape[2] * z;
+	x = m->dshape.shape[1] * y;
+	w = m->dshape.shape[0] * x;
+	index = dimen0*x + dimen1*y + dimen2*z + dimen3;
+	*(m->array + index) = elem;
 	return 0;
 }
 
@@ -1090,12 +1110,14 @@ static int GetEchelonMatrix(Matrix *m){
 		if(*(m->array + i*m->dshape.shape[3] + i) != 0){
 			kDivSecondOrderMatrixRow(m,i,*(m->array + i*m->dshape.shape[3] + i));
 		}
-	}
+	}	
 	return 0;
 }
 
 //求二维矩阵的最简行阶梯阵
 Matrix *getEchelonMatrix(Matrix *m){
+	int i,j;
+	int count0,count1;
 	Matrix *copym = NULL;
 	copym = copyMatrix(m);
 	if(!copym) return NULL;
@@ -1103,6 +1125,17 @@ Matrix *getEchelonMatrix(Matrix *m){
 		destroyMatrix(copym);
 		return NULL;
 	}else{
+		for(i=0;i<copym->dshape.shape[2]-1;i++){ //全0行移动到后面
+			count0 = 0;
+			count1 = 0;
+			for(j=0;j<copym->dshape.shape[3];j++){
+				if(*(copym->array + i*copym->dshape.shape[3] + j) == 0) count0 ++;
+				if(*(copym->array + (i+1)*copym->dshape.shape[3] + j) == 0) count1 ++;
+			}
+			if(count0 == copym->dshape.shape[3] && count1 != copym->dshape.shape[3]){
+				swapSecondOrderMatrixRow(copym,i,i+1); //交换两行
+			}
+		}
 		return copym;
 	}
 }
@@ -1129,9 +1162,133 @@ int getSecondOrderMatrixRank(Matrix *m ,int *rank){
 	return 0;
 }
 
-//求解线性矩阵方程
-Matrix *solveSecondOrderMatrix(Matrix *m){
-	
+//求解齐次线性方程组: AX=0，要求A为m X n矩阵，结果为基础解系矩阵
+Matrix *solveHomoLinearEquations(Matrix *A){
+	int i,j,zerocount = 0,zerorow = 0,rank;
+	if(!A) return NULL;
+	Matrix *resultm = NULL;
+	resultm = copyMatrix(A);
+	if(!resultm) return NULL;
+	GetEchelonMatrix(resultm);
+	for(i=0;i<resultm->dshape.shape[2];i++){
+		zerocount = 0;
+		for(j=0;j<resultm->dshape.shape[3];j++){
+			if(*(resultm->array + i*resultm->dshape.shape[3] + j) == 0){
+				zerocount ++;
+			}
+		}
+		if(zerocount == resultm->dshape.shape[3]){
+			zerorow ++;
+		}
+	}
+	rank = resultm->dshape.shape[2] - zerorow;
+	if(rank == A->dshape.shape[3]){ //r(A) = n，只有0解
+		Dshape dshape;
+		dshape.shape[0] = 0;
+		dshape.shape[1] = 0;
+		dshape.shape[2] = A->dshape.shape[3];
+		dshape.shape[3] = 1;
+		destroyMatrix(resultm);
+		resultm = creatZerosMatrix(dshape);
+	}else{ //r(A) < n,有非0解
+		int columecount = 0;
+		for(i=0;i<resultm->dshape.shape[2] ;i++){
+			if(*(resultm->array + i*resultm->dshape.shape[3] + i) == 0){
+				modifyMatrixElem(resultm,0,0,i,i,-1);
+			}
+		}
+		for(i=resultm->dshape.shape[2];i<resultm->dshape.shape[3];i++){
+			Dshape dshape;
+			dshape.shape[0] = 0;
+			dshape.shape[1] = 0;
+			dshape.shape[2] = 0;
+			dshape.shape[3] = resultm->dshape.shape[3];
+			Matrix *tempm = creatZerosMatrix(dshape);
+			modifyMatrixElem(tempm,0,0,0,i,-1);
+			spliceSecondOrderMatrixRow(resultm,tempm);
+			destroyMatrix(tempm);
+		}
+		for(i=0;i<resultm->dshape.shape[2] ;i++){
+			if(*(resultm->array + i*resultm->dshape.shape[3] + i - columecount) == 1){
+				deleteSecondOrderMatrixColumes(resultm,i - columecount,i - columecount + 1);
+				columecount++;
+			}
+		}
+		kMulMatrix(resultm,-1);
+	}
+	return resultm;
+}
+
+//求解非齐次线性方程组: AX=B,要求A为m X n矩阵，B为m X 1矩阵,结果为基础解系 + 一个特解(最后一列)
+Matrix *solveNonHomoLinearEquations(Matrix *A, Matrix *B){
+	int ranka,ranker;
+	int i,j,zerocount = 0,zerorow = 0;
+	Matrix *erweitertem = NULL;
+	Matrix *resultm = NULL;
+	Matrix *tempm = NULL;
+	if(!A || !B) return NULL;
+	if(A->dshape.shape[2] != B->dshape.shape[2]) return NULL;
+	erweitertem = copyMatrix(A);
+	if(!erweitertem) return NULL;
+	spliceSecondOrderMatrixColume(erweitertem,B); //构造增广矩阵
+	getSecondOrderMatrixRank(A,&ranka);
+	tempm = copyMatrix(erweitertem);
+	if(!tempm){
+		destroyMatrix(erweitertem);
+		return NULL;
+	}
+	GetEchelonMatrix(tempm);
+	for(i=0;i<tempm->dshape.shape[2];i++){
+		zerocount = 0;
+		for(j=0;j<tempm->dshape.shape[3];j++){
+			if(*(tempm->array + i*tempm->dshape.shape[3] + j) == 0){
+				zerocount ++;
+			}
+		}
+		if(zerocount == tempm->dshape.shape[3]){
+			zerorow ++;
+		}
+	}
+	ranker = tempm->dshape.shape[2] - zerorow;
+	destroyMatrix(erweitertem);
+	if(ranka < ranker){ //增广矩阵的秩大于A的秩，无解
+		destroyMatrix(tempm);
+		return NULL;
+	}else if(ranka == ranker){ //增广矩阵的秩等于A的秩
+		if(ranka == A->dshape.shape[3]){ //r(A) = n,方程组有唯一解
+			resultm = getSecondOrderSubMatrix(tempm,0,ranker,ranker,tempm->dshape.shape[3]);
+			destroyMatrix(tempm);
+			return resultm;
+		}else{ //r(A) < n,方程组有无穷多解
+			int columecount = 0;
+			for(i=0;i<tempm->dshape.shape[2] ;i++){
+				if(*(tempm->array + i*tempm->dshape.shape[3] + i) == 0){
+					modifyMatrixElem(tempm,0,0,i,i,-1);
+				}
+			}
+			for(i=tempm->dshape.shape[2];i<tempm->dshape.shape[3]-1;i++){
+				Dshape dshape;
+				dshape.shape[0] = 0;
+				dshape.shape[1] = 0;
+				dshape.shape[2] = 0;
+				dshape.shape[3] = tempm->dshape.shape[3];
+				Matrix *tempm1 = creatZerosMatrix(dshape);
+				modifyMatrixElem(tempm1,0,0,0,i,-1);
+				spliceSecondOrderMatrixRow(tempm,tempm1);
+				destroyMatrix(tempm1);
+			}
+			for(i=0;i<tempm->dshape.shape[2];i++){
+				if(*(tempm->array + i*tempm->dshape.shape[3] + i - columecount) == 1){
+					deleteSecondOrderMatrixColumes(tempm,i - columecount,i - columecount + 1);
+					columecount++;
+				}
+			}
+			for(i=0;i<tempm->dshape.shape[3]-1;i++){
+				kMulSecondOrderMatrixColume(tempm,i,-1);
+			}
+			return tempm;
+		}
+	}
 }
 
 //求矩阵的无穷范数,每一行上的元素绝对值求和，再从中取最大的
