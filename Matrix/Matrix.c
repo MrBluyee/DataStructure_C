@@ -392,6 +392,32 @@ Matrix *copyMatrix(Matrix *m){
 	return copym;
 }
 
+//比较两个数组
+int compareMatrix(Matrix *m1, Matrix *m2){
+	int i,compare_flag = 0;
+	if(!m1 || !m2) return 0;
+	if(m1->length != m2->length) return 0;
+	for(i=0;i<4;i++)
+	{
+		if(m1->dshape.shape[i] != m2->dshape.shape[i]){
+			compare_flag = 1;
+			break;
+		}
+	}
+	if(compare_flag) return 0;
+	for(i=0;i<m1->length;i++){
+		if(*(m1->array+i) != *(m2->array+i)){
+			compare_flag = 1;
+			break;
+		}
+	}
+	if(compare_flag){
+		return 0;
+	}else{
+		return 1;
+	}
+}
+
 //提取二维数组的连续多行，返回一个包含多行内容的子数组
 Matrix *getSecondOrderMatrixRows(Matrix *m,int startRow,int endRow){
 	int i = 0;
@@ -512,6 +538,25 @@ int transposeSecondOrderMatrix(Matrix *m){
 	}
 	destroyMatrix(m1);
 	return 0;
+}
+
+//判断是否实对称矩阵
+int isSymmetricMatrix(Matrix *m){
+	Matrix *temp = NULL;
+	if(!m) return 0;
+	//判断是否为二维方阵
+	if(m->dshape.shape[0] != 0 || m->dshape.shape[1] != 0 || 
+	m->dshape.shape[2] == 0 || m->dshape.shape[2] != m->dshape.shape[3]) return 0;
+	temp = copyMatrix(m);
+	if(!temp) return 0;
+	if(transposeSecondOrderMatrix(temp) != 0) return 0;
+	if(compareMatrix(m, temp) == 0){
+		destroyMatrix(temp);
+		return 0;
+	}else{
+		destroyMatrix(temp);
+		return 1;
+	}
 }
 
 //交换二维数组的两行
@@ -1290,6 +1335,105 @@ Matrix *solveNonHomoLinearEquations(Matrix *A, Matrix *B){
 		}
 	}
 }
+
+//雅克比(Jacobi)方法实现实对称矩阵的特征值和特征向量的求解
+//返回矩阵第一行为特征值，特征值下面的列为对应的特征向量
+Matrix *getSymmetricMatrixEigen(Matrix *m){
+	Matrix *resultm = NULL;
+	Matrix *tempm = NULL;
+	int nCount = 0,i,j;
+	if(isSymmetricMatrix(m) == 0) return NULL;
+	tempm = copyMatrix(m);
+	if(!tempm) return NULL;
+	resultm = creatIdentitySecondOrderMatrix(m->dshape);
+	if(!resultm) return NULL;
+	while(1){
+		double dbMax = *(tempm->array + 1);
+		int nRow = 0;
+		int nCol = 1;
+		for(i=0;i<tempm->dshape.shape[2];i++){ //在矩阵非对角线上找到最大的元素
+			for(j=0;j<tempm->dshape.shape[3];j++){
+				if(i != j){
+					double d = fabs(*(tempm->array + i*tempm->dshape.shape[3] + j)); 
+					if(d > dbMax){
+						dbMax = d;
+						nRow = i;
+						nCol = j;
+					}
+				}
+			}
+		}
+		if(dbMax < 1e-10) break; //精度符合要求，不再迭代
+		if(nCount > tempm->dshape.shape[3] * tempm->dshape.shape[3] * 30) break; //迭代次数超过限制
+		nCount++;
+		double dbApp = *(tempm->array + nRow*tempm->dshape.shape[3] + nRow);
+		double dbApq = *(tempm->array + nRow*tempm->dshape.shape[3] + nCol);
+		double dbAqq = *(tempm->array + nCol*tempm->dshape.shape[3] + nCol);
+		
+		//计算旋转角度
+		double dbAngle = 0.5*atan2(-2*dbApq,dbAqq-dbApp);
+		double dbSinTheta = sin(dbAngle);
+		double dbCosTheta = cos(dbAngle);
+		double dbSin2Theta = sin(2*dbAngle);
+		double dbCos2Theta = cos(2*dbAngle);
+		
+		*(tempm->array + nRow*tempm->dshape.shape[3] + nRow) = dbApp*dbCosTheta*dbCosTheta + 
+			dbAqq*dbSinTheta*dbSinTheta + 2*dbApq*dbCosTheta*dbSinTheta;
+		*(tempm->array + nCol*tempm->dshape.shape[3] + nCol) = dbApp*dbSinTheta*dbSinTheta + 
+			dbAqq*dbCosTheta*dbCosTheta - 2*dbApq*dbCosTheta*dbSinTheta;
+		*(tempm->array + nRow*tempm->dshape.shape[3] + nCol) = 0.5*(dbAqq-dbApp)*dbSin2Theta + dbApq*dbCos2Theta;
+		*(tempm->array + nCol*tempm->dshape.shape[3] + nRow) = *(tempm->array + nRow*tempm->dshape.shape[3] + nCol);
+		
+		for(i=0;i<tempm->dshape.shape[3];i++){
+			if((i!=nCol)&&(i!=nRow)){
+				int u = i*tempm->dshape.shape[3] + nRow; // p
+				int w = i*tempm->dshape.shape[3] + nCol; //q
+				dbMax = *(tempm->array + u);
+				*(tempm->array + u) = *(tempm->array + w) * dbSinTheta + dbMax * dbCosTheta; 
+				*(tempm->array + w) = *(tempm->array + w) * dbCosTheta - dbMax * dbSinTheta;
+			}
+		}
+		for(j=0;j<tempm->dshape.shape[3];j++){
+			if((j!=nCol)&&(j!=nRow)){
+				int u = nRow*tempm->dshape.shape[3] + j; //p
+				int w = nCol*tempm->dshape.shape[3] + j; //q
+				dbMax = *(tempm->array + u);
+				*(tempm->array + u) = *(tempm->array + w) * dbSinTheta + dbMax * dbCosTheta; 
+				*(tempm->array + w) = *(tempm->array + w) * dbCosTheta - dbMax * dbSinTheta;
+			}
+		}
+		
+		//计算特征向量
+		for(i=0;i<resultm->dshape.shape[3];i++){
+			int u = i*resultm->dshape.shape[3] + nRow; // p
+			int w = i*resultm->dshape.shape[3] + nCol; //q
+			dbMax = *(resultm->array + u);
+			*(resultm->array + u) = *(resultm->array + w) * dbSinTheta + dbMax*dbCosTheta; 
+			*(resultm->array + w) = *(resultm->array + w) * dbCosTheta - dbMax*dbSinTheta;
+		}
+	}
+	Matrix *eigenVal = (Matrix *)malloc(sizeof(Matrix));
+	if(!eigenVal) return NULL;
+	eigenVal->dshape.shape[0] = 0;
+	eigenVal->dshape.shape[1] = 0;
+	eigenVal->dshape.shape[2] = 0;
+	eigenVal->dshape.shape[3] = tempm->dshape.shape[3];
+	eigenVal->length = tempm->dshape.shape[3];
+	eigenVal->size = eigenVal->length;
+	eigenVal->array = (double *)malloc(eigenVal->size*sizeof(double));
+	if(!eigenVal->array){
+		free(eigenVal);
+		return NULL;
+	}
+	for(i=0;i<resultm->dshape.shape[3];i++){
+		*(eigenVal->array + i) = *(tempm->array + i*tempm->dshape.shape[3] + i);
+	}
+	spliceSecondOrderMatrixRow(eigenVal,resultm);
+	destroyMatrix(tempm);
+	destroyMatrix(resultm);
+	return eigenVal;
+}
+
 
 //求矩阵的无穷范数,每一行上的元素绝对值求和，再从中取最大的
 double getMatrixInfNorm(Matrix *m){
