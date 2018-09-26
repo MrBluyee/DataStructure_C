@@ -2,8 +2,6 @@
 #include <malloc.h>
 #include "DLLStack.h"
 
-//测试用例，需要将ElemTypeDefine.h里的DLLSElemType定义改为int型的。
-
 int printElem(DLLSElemType **e){
 	printf("%d",**e);
 	return 0;

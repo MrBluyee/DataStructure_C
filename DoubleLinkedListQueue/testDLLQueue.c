@@ -2,8 +2,6 @@
 #include <malloc.h>
 #include "DLLQueue.h"
 
-//测试用例，需要将ElemTypeDefine.h里的DLLQElemType定义改为int型的。
-
 int printElem(DLLQElemType **e){
 	printf("%d",**e);
 	return 0;
