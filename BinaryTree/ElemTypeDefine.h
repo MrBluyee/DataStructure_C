@@ -14,7 +14,7 @@ typedef struct BiTNode{
 }BiTNode;
 
 //**********************************************************************//
-typedef int DLLSElemType;
+typedef BiTNode DLLSElemType;
 
 typedef struct DLLSNode{
 	DLLSElemType *elem;
@@ -23,7 +23,7 @@ typedef struct DLLSNode{
 }DLLSNode;
 
 //**********************************************************************//
-typedef int DLLQElemType;
+typedef BiTNode DLLQElemType;
 
 typedef struct DLLQNode{
 	DLLQElemType *elem;
