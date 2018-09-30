@@ -16,6 +16,7 @@ int printMyStringElem(MyString **str){
 int main(void){
 	int i;
 	char words[] = {"without new experiences, something inside of us sleeps."};
+	char bracket[] = {"(A(B(E(K,L),F),C(G),D(H(M),I,J)))"};
 	MyString *str_a = NULL;
 	MyString *str_b = NULL;
 	MyString *str_c = NULL;
@@ -88,5 +89,10 @@ int main(void){
 	destroyMyString(str_b);
 	destroyMyString(str_c);
 	DestroyMyStringArray(str_array);
+
+	str_a = myStringAssign(bracket);
+	printf("\n");
+	printMyString(str_a);
+	printf("bracketMatching :%d\n",bracketMatching(str_a));
 	return 0;
 }

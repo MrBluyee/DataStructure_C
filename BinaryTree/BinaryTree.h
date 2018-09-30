@@ -6,10 +6,18 @@
 /* Exported types ------------------------------------------------------------*/
 
 typedef enum BinaryTreeOrder{
-	preOrder; //前序
-	inOrder; //中序
-	postOrder; //后序
+	preOrder, //前序
+	inOrder, //中序
+	postOrder //后序
 }BinaryTreeOrder;
+
+typedef struct BiTNode{
+	BiTNodeElemType *elem;
+	int id;
+	struct BiTNode *parent;
+	struct BiTNode *left;
+	struct BiTNode *right;
+}BiTNode;
 
 typedef struct BinaryTree{
 	BiTNode *Root;  

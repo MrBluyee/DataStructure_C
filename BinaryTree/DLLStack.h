@@ -5,6 +5,12 @@
 #include "ElemTypeDefine.h"
 /* Exported types ------------------------------------------------------------*/
 
+typedef struct DLLSNode{
+	DLLSElemType *elem;
+	struct DLLSNode *prior;
+	struct DLLSNode *next;
+}DLLSNode;s
+
 typedef struct DLLStack{
 	DLLSNode *front;
 	DLLSNode *tear;

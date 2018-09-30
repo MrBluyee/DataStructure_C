@@ -2,8 +2,8 @@
 #ifndef _ELEMTYPEDEFINE_H
 #define _ELEMTYPEDEFINE_H
 
-typedef int BiTNodeElemType;
-typedef BiTNode DLLSElemType;
-typedef BiTNode DLLQElemType;
+#include "MyString.h"
+
+typedef MyString GLNodeElemType;
 
 #endif

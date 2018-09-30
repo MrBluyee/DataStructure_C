@@ -5,6 +5,12 @@
 #include "ElemTypeDefine.h"
 /* Exported types ------------------------------------------------------------*/
 
+typedef struct DLLQNode{
+	DLLQElemType *elem;
+	struct DLLQNode *prior;
+	struct DLLQNode *next;
+}DLLQNode;
+
 typedef struct DLLQueue{
 	DLLQNode *front;
 	DLLQNode *tear;
