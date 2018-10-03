@@ -45,6 +45,7 @@ int myStringLength(MyString *S);
 int isMyStringEmpty(MyString *S);
 int clearMyString(MyString *S);
 void destroyMyString(MyString *S);
+int printMyString(MyString *str);
 int compareMyString(MyString *S1,MyString *S2);
 MyString *copyMyString(MyString *S);
 int myStringIndexChar(MyString *S,char indexElem,int pos);
@@ -55,6 +56,6 @@ int replaceMyString(MyString *S1,MyString *S2,int start,int end);
 MyString *substrMyString(MyString *S,int start,int end);
 MyStringArray *splitMyString(MyString *S,char splitElem);
 int myStringIndexSubString(MyString *S,MyString *substr,int pos);
-int bracketMatching(MyString *S);
-
+int isBracketMatching(MyString *S,char leftBracketChar);
+int getMatchingBracketIndex(MyString *S,char leftBracketChar,int leftbracketIndex);
 #endif

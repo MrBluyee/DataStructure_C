@@ -2,6 +2,10 @@
 #ifndef _GLIST_H
 #define _GLIST_H
 
+#include "MyString.h"
+
+typedef MyString GLNodeElemType;
+
 typedef enum GLNodeElemTag{
 	ATOM,  //原子结点
 	LIST   //表结点
@@ -18,7 +22,33 @@ typedef struct GLNode{
 }GLNode;
 
 typedef struct GList{
-	GLNode *Root;
+	GLNode *root;
+	GLNode *tear;
+	int (*isEmpty)(struct GList *This);
+	int (*length)(struct GList *This);
+	void (*print)(struct GList *This);
+	int (*getDepth)(struct GList *This);
+	int (*getHead)(struct GList *This,GLNode **n);
+	int (*getTear)(struct GList *This,GLNode **n);
+	int (*getGLNode)(struct GList *This,int index,GLNode **n);
+	int (*insertGLNode)(struct GList *This, int index, GLNode *n);
+	int (*insertGLNodeFront)(struct GList *This, GLNode *n);
+	int (*deleteGLNodeFront)(struct GList *This);
+	int (*insertGLNodeTear)(struct GList *This, GLNode *n);
+	int (*deleteGLNodeTear)(struct GList *This);
+	void (*traversal)(struct GList *This,int (*visit)(GLNodeElemType **elem));
 }GList;
+
+GList *initGListFromString(char *listStr);
+GList *initGListFromGLNode(GLNode *n);
+GList *copyGList(GList *L);
+void DestroyGList(GList *L);
+
+void printGLNode(GLNode *n);
+int getGLNodeDepth(GLNode *n);
+GLNode *copyGLNode(GLNode *n);
+void traversalGLNode(GLNode *n,int (*visit)(GLNodeElemType **elem));
+void destroyGLNode(GLNode *n);
+
 
 #endif

@@ -93,6 +93,7 @@ int main(void){
 	str_a = myStringAssign(bracket);
 	printf("\n");
 	printMyString(str_a);
-	printf("bracketMatching :%d\n",bracketMatching(str_a));
+	printf("bracketMatching :%d\n",isBracketMatching(str_a,'('));
+	printf("MatchingBracketIndex :%d\n",getMatchingBracketIndex(str_a,'(',4));
 	return 0;
 }

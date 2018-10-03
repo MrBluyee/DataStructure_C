@@ -24,14 +24,23 @@ MyString *myStringAssign(char *str){
 }
 
 int myStringLength(MyString *S){
-	return S->length;
+	if(S){
+		return S->length;
+	}else{
+		return 0;
+	}
 }
 
 int myStringRemainSpace(MyString *S){
-	return S->size - S->length -1;
+	if(S){
+		return S->size - S->length -1;
+	}else{
+		return 0;
+	}
 }
 
 int isMyStringEmpty(MyString *S){
+	if(!S) return 0;
 	if(S->length){
 		return 0;
 	}else{
@@ -40,20 +49,38 @@ int isMyStringEmpty(MyString *S){
 }
 
 int clearMyString(MyString *S){
-	*S->str = '\0';
-	S->length = 0;
+	if(S){
+		if(S->str){
+			*S->str = '\0';
+		}
+		S->length = 0;
+	}
 }
 
 void destroyMyString(MyString *S){
-	free(S->str);
-	S->str = NULL;
-	free(S);
-	S = NULL;
+	if(S){
+		if(S->str){
+			free(S->str);
+		}
+		free(S);
+		S = NULL;
+	}
+}
+
+int printMyString(MyString *S){
+	if(S){
+		if(S->str){
+			printf("%s, ",S->str);
+		}
+		printf("length :%d\n",S->length);
+	}
+	return 0;
 }
 
 int compareMyString(MyString *S1,MyString *S2){
 	int i;
 	int result = 0;
+	if(!S1 || !S2) return result;
 	for(i=0;i<S1->length && i<S2->length;i++){
 		if(*(S1->str+i) != *(S2->str+i)){
 			result = *(S1->str+i) - *(S2->str+i);
@@ -68,7 +95,7 @@ int compareMyString(MyString *S1,MyString *S2){
 
 MyString *copyMyString(MyString *S){
 	int i;
-	if(!S->str) return NULL;
+	if(!S || !S->str) return NULL;
 	MyString *temp = (MyString *)malloc(sizeof(MyString));
 	if(!temp) return NULL;
 	temp->size = S->length + 1;
@@ -99,7 +126,7 @@ int myStringIndexChar(MyString *S,char indexElem,int pos){
 
 int insertMyString(MyString *S1,MyString *S2,int pos){
 	int i;
-	if(!S2->str) return -1;
+	if(!S1 || !S1->str || !S2 || !S2->str) return -1;
 	if(pos < 0 || pos > S1->length) return -1;
 	if(myStringRemainSpace(S1) < S2->length){
 		S1->size += S2->length - myStringRemainSpace(S1);
@@ -264,7 +291,7 @@ int myStringIndexSubString(MyString *S,MyString *substr,int pos){ //KMP算法
 	}
 }
 
-int bracketMatching(MyString *S){
+static int parenthesesMatching(MyString *S){
 	if(!S) return 0; 
 	int bracket_count = 0,str_index = 0;
 	int bracket_contained = 0;
@@ -287,4 +314,143 @@ int bracketMatching(MyString *S){
 		if(bracket_count == 0) return 1;
 	}
 	return 0;
+}
+
+static int squareBracketMatching(MyString *S){
+	if(!S) return 0; 
+	int bracket_count = 0,str_index = 0;
+	int bracket_contained = 0;
+	if(*(S->str+str_index) != '[') return 0;
+	while(*(S->str+str_index) != '\0'){
+		if(*(S->str+str_index)  == '['){
+			bracket_contained = 1;
+			bracket_count++;
+		}else if(*(S->str+str_index) == ']'){
+			if(bracket_count){
+				bracket_count --;
+			}else{
+				bracket_contained = 0;
+				break;
+			}
+		}
+		str_index++;
+	}
+	if(bracket_contained){
+		if(bracket_count == 0) return 1;
+	}
+	return 0;
+}
+
+static int braceMatching(MyString *S){
+	if(!S) return 0; 
+	int bracket_count = 0,str_index = 0;
+	int bracket_contained = 0;
+	if(*(S->str+str_index) != '{') return 0;
+	while(*(S->str+str_index) != '\0'){
+		if(*(S->str+str_index)  == '{'){
+			bracket_contained = 1;
+			bracket_count++;
+		}else if(*(S->str+str_index) == '}'){
+			if(bracket_count){
+				bracket_count --;
+			}else{
+				bracket_contained = 0;
+				break;
+			}
+		}
+		str_index++;
+	}
+	if(bracket_contained){
+		if(bracket_count == 0) return 1;
+	}
+	return 0;
+}
+
+int isBracketMatching(MyString *S,char leftBracketChar){
+	int isMatching = 0;
+	switch(leftBracketChar){
+		case '(': 
+			isMatching = parenthesesMatching(S);
+			break;
+		case '[':
+			isMatching = squareBracketMatching(S);
+			break;
+		case '{':
+			isMatching = braceMatching(S);
+			break;
+	}
+	return isMatching;
+}
+
+static int getMatchingParenthesisIndex(MyString *S,int leftbracketIndex){
+	if(!S) return -1; 
+	int bracket_count = 0,str_index = leftbracketIndex;
+	int bracket_contained = 0;
+	if(*(S->str+str_index) != '(') return -1;
+	while(*(S->str+str_index) != '\0'){
+		if(*(S->str+str_index)  == '('){
+			bracket_contained = 1;
+			bracket_count++;
+		}else if(*(S->str+str_index) == ')'){
+			bracket_count --;
+			if(bracket_count == 0) break;
+		}
+		str_index++;
+	}
+	if(str_index > S->length) return -1;
+	return str_index;
+}
+
+static int getMatchingSquareBracketIndex(MyString *S,int leftbracketIndex){
+	if(!S) return -1; 
+	int bracket_count = 0,str_index = leftbracketIndex;
+	int bracket_contained = 0;
+	if(*(S->str+str_index) != '[') return -1;
+	while(*(S->str+str_index) != '\0'){
+		if(*(S->str+str_index)  == '['){
+			bracket_contained = 1;
+			bracket_count++;
+		}else if(*(S->str+str_index) == ']'){
+			bracket_count --;
+			if(bracket_count == 0) break;
+		}
+		str_index++;
+	}
+	if(str_index > S->length) return -1;
+	return str_index;
+}
+
+static int getMatchingBraceIndex(MyString *S,int leftbracketIndex){
+	if(!S) return -1; 
+	int bracket_count = 0,str_index = leftbracketIndex;
+	int bracket_contained = 0;
+	if(*(S->str+str_index) != '{') return -1;
+	while(*(S->str+str_index) != '\0'){
+		if(*(S->str+str_index)  == '{'){
+			bracket_contained = 1;
+			bracket_count++;
+		}else if(*(S->str+str_index) == '}'){
+			bracket_count --;
+			if(bracket_count == 0) break;
+		}
+		str_index++;
+	}
+	if(str_index > S->length) return -1;
+	return str_index;
+}
+
+int getMatchingBracketIndex(MyString *S,char leftBracketChar,int leftbracketIndex){
+	int index = 0;
+	switch(leftBracketChar){
+		case '(': 
+			index = getMatchingParenthesisIndex(S,leftbracketIndex);
+			break;
+		case '[':
+			index = getMatchingSquareBracketIndex(S,leftbracketIndex);
+			break;
+		case '{':
+			index = getMatchingBraceIndex(S,leftbracketIndex);
+			break;
+	}
+	return index;
 }
