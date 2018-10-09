@@ -2,8 +2,8 @@
 #include <malloc.h>
 #include "DLLStack.h"
 
-int printElem(DLLSElemType **e){
-	printf("%d",**e);
+int printElem(void **e){
+	printf("%d",*((int *)*e));
 	return 0;
 }
 
@@ -34,9 +34,9 @@ int main(void){
 	S->downTraverse(S,printElem);
 	printf("\n");
 	for(i=0;i<10;i++){
-		S->getTopElem(S,&elem);
+		S->getTopElem(S,(void **)(&elem));
 		printf("top elem:%d\n",*elem);
-		S->popElem(S,&elem);
+		S->popElem(S,(void **)(&elem));
 		printf("pop elem:%d\n",*elem);
 	}
 	printf("is DLLStack empty:%d\n",S->isEmpty(S));

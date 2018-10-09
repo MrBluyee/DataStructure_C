@@ -2,8 +2,12 @@
 #ifndef _DLLSTACK_H
 #define _DLLSTACK_H
 /* Includes ------------------------------------------------------------------*/
-#include "ElemTypeDefine.h"
 /* Exported types ------------------------------------------------------------*/
+typedef struct DLLSNode{
+	void *elem;
+	struct DLLSNode *prior;
+	struct DLLSNode *next;
+}DLLSNode;
 
 typedef struct DLLStack{
 	DLLSNode *front;
@@ -11,11 +15,11 @@ typedef struct DLLStack{
 	void (*clear)(struct DLLStack *This);
 	int (*isEmpty)(struct DLLStack *This);
 	int (*length)(struct DLLStack *This);
-	void (*riseTraverse)(struct DLLStack *This,int (*visit)(DLLSElemType **e));
-	void (*downTraverse)(struct DLLStack *This,int (*visit)(DLLSElemType **e));
-	int (*getTopElem)(struct DLLStack *This, DLLSElemType **e);
-	int (*pushElem)(struct DLLStack *This, DLLSElemType *e);
-	int (*popElem)(struct DLLStack *This, DLLSElemType **e);
+	void (*riseTraverse)(struct DLLStack *This,int (*visit)(void **e));
+	void (*downTraverse)(struct DLLStack *This,int (*visit)(void **e));
+	int (*getTopElem)(struct DLLStack *This, void **e);
+	int (*pushElem)(struct DLLStack *This, void *e);
+	int (*popElem)(struct DLLStack *This, void **e);
 }DLLStack;
 
 /* Exported macro ------------------------------------------------------------*/

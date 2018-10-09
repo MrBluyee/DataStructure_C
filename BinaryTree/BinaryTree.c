@@ -6,10 +6,19 @@
 
 BinaryTree *InitBinaryTree(){
 	BinaryTree *T = (BinaryTree *)malloc(sizeof(BinaryTree));
+	if(!T) return NULL;
 	BiTNode *n = (BiTNode *)malloc(sizeof(BiTNode));
-	n->elem = (BiTNodeElemType *)malloc(sizeof(BiTNodeElemType));
 	T->This = n;
 	return T;
+}
+
+static void clearBiTNode(BiTNode *T,int (*destroyElem)(void **elem)){
+	if(!T){
+		clearBiTNode(T->left,destroyElem);
+		clearBiTNode(T->right,destroyElem);
+		if()
+		if(visit(&T) != 0) return;
+	}
 }
 
 void DestroyBinaryTree(BinaryTree *T){
@@ -23,14 +32,6 @@ void DestroyBinaryTree(BinaryTree *T){
 		free(T);
 		L = NULL;
 	}
-}
-
-static void createBinaryTree(BiTNode *T,BiTNodeElemType *data,int length){
-	if(!data) return;
-	DLLStack *BiTreeStack = InitDLLStack();
-	T = (BiTNode *)malloc(sizeof(BiTNode));
-	if(!T) exit(OVERFLOW);
-	T->elem = data;
 }
 
 //递归前序遍历
@@ -72,7 +73,7 @@ static void preOrderTraversal2(BiTNode *T,int (*visit)(BiTNode **T)){
 			p = p->left; //遍历左子树
 		}
 		else{
-			BiTreeStack->popElem(BiTreeStack,&p); //退栈
+			BiTreeStack->popElem(BiTreeStack,(void **)&p); //退栈
 			p = p->right; //遍历右子树
 		}
 	}
@@ -90,7 +91,7 @@ static void inOrderTraversal2(BiTNode *T,int (*visit)(BiTNode **T)){
 			p = p->left; //遍历左子树
 		}
 		else{
-			BiTreeStack->popElem(BiTreeStack,&p); //退栈
+			BiTreeStack->popElem(BiTreeStack,(void **)&p); //退栈
 			if(visit(&p) != 0) break;
 			p = p->right; //遍历右子树
 		}
@@ -111,7 +112,7 @@ static void postOrderTraversal2(BiTNode *T,int (*visit)(BiTNode **T)){
 		(pre != NULL && (pre == p->left || pre == p->right))) //子节点都已被访问过
 		{
 			if(visit(&p) != 0) break;
-			BiTreeStack->popElem(BiTreeStack,&p); //退栈
+			BiTreeStack->popElem(BiTreeStack,(void **)&p); //退栈
 			pre = p;
 		}
 		else{
@@ -165,7 +166,7 @@ static void breadthFirstTraversal(BiTNode *T,int (*visit)(BiTNode **T)){
 	BiTNode *p = NULL;
 	BiTreeQueue->enQueue(BiTreeQueue,T->Root);
 	while(!BiTreeQueue->isEmpty(BiTreeQueue)){ //队列不空
-		BiTreeQueue->deQueue(BiTreeQueue,&p);
+		BiTreeQueue->deQueue(BiTreeQueue,(void **)&p);
 		if(visit(&p) != 0) break;
 		if(p->left){
 			BiTreeQueue->enQueue(BiTreeQueue,p->left);  //先将左子树入队

@@ -2,8 +2,8 @@
 #include <malloc.h>
 #include "DLLQueue.h"
 
-int printElem(DLLQElemType **e){
-	printf("%d",**e);
+int printElem(void **e){
+	printf("%d",*((int *)*e));
 	return 0;
 }
 
@@ -34,9 +34,9 @@ int main(void){
 	Q->downTraverse(Q,printElem);
 	printf("\n");
 	for(i=0;i<10;i++){
-		Q->getHead(Q,&elem);
+		Q->getHead(Q,(void **)&elem);
 		printf("Head elem:%d\n",*elem);
-		Q->deQueue(Q,&elem);
+		Q->deQueue(Q,(void **)&elem);
 		printf("deQueue elem:%d\n",*elem);
 	}
 	printf("is DLLQueue empty:%d\n",Q->isEmpty(Q));

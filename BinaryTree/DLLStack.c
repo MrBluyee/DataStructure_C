@@ -5,11 +5,11 @@
 static void clear(DLLStack *This);
 static int isEmpty(DLLStack *This);
 static int length(DLLStack *This);
-static void riseTraverse(DLLStack *This,int (*visit)(DLLSElemType **e));
-static void downTraverse(DLLStack *This,int (*visit)(DLLSElemType **e));
-static int getTopElem(DLLStack *This, DLLSElemType **e);
-static int pushElem(DLLStack *This, DLLSElemType *e);
-static int popElem(DLLStack *This, DLLSElemType **e);
+static void riseTraverse(DLLStack *This,int (*visit)(void **e));
+static void downTraverse(DLLStack *This,int (*visit)(void **e));
+static int getTopElem(DLLStack *This, void **e);
+static int pushElem(DLLStack *This, void *e);
+static int popElem(DLLStack *This, void **e);
 
 DLLStack *InitDLLStack(){
 	DLLStack *S = (DLLStack *)malloc(sizeof(DLLStack));
@@ -77,7 +77,7 @@ static int length(DLLStack *This){
 	return j;
 }
 
-static void riseTraverse(DLLStack *This,int (*visit)(DLLSElemType **e)){
+static void riseTraverse(DLLStack *This,int (*visit)(void **e)){
 	DLLSNode *p = This->front->next;
 	while(p){
 		if(visit(&(p->elem)) != 0) break;
@@ -85,7 +85,7 @@ static void riseTraverse(DLLStack *This,int (*visit)(DLLSElemType **e)){
 	} 
 }
 
-static void downTraverse(DLLStack *This,int (*visit)(DLLSElemType **e)){
+static void downTraverse(DLLStack *This,int (*visit)(void **e)){
 	DLLSNode *p = This->tear;
 	while(p != This->front){
 		if(visit(&(p->elem)) != 0) break;
@@ -94,13 +94,13 @@ static void downTraverse(DLLStack *This,int (*visit)(DLLSElemType **e)){
 }
 
 
-static int getTopElem(DLLStack *This, DLLSElemType **e){
+static int getTopElem(DLLStack *This, void **e){
 	if(isEmpty(This)) return -1;
 	*e = This->tear->elem;
 	return 0;
 }
 
-static int pushElem(DLLStack *This, DLLSElemType *e){
+static int pushElem(DLLStack *This, void *e){
 	DLLSNode *p = This->tear;
 	DLLSNode *temp = (DLLSNode *)malloc(sizeof(DLLSNode));
 	if(!temp) return -1;
@@ -112,7 +112,7 @@ static int pushElem(DLLStack *This, DLLSElemType *e){
 	return 0;
 }
 
-static int popElem(DLLStack *This, DLLSElemType **e){
+static int popElem(DLLStack *This, void **e){
 	if(This->front == This->tear){
 		*e = NULL;
 		return -1;
