@@ -12,8 +12,7 @@ typedef enum BinaryTreeOrder{
 }BinaryTreeOrder;
 
 typedef struct BiTNode{
-	BiTNodeElemType *elem;
-	int id;
+	void *elem;
 	struct BiTNode *parent;
 	struct BiTNode *left;
 	struct BiTNode *right;

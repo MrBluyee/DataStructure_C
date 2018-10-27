@@ -5,11 +5,11 @@
 static void clear(DLLQueue *This);
 static int isEmpty(DLLQueue *This);
 static int length(DLLQueue *This);
-static void riseTraverse(DLLQueue *This,int (*visit)(DLLQElemType **e));
-static void downTraverse(DLLQueue *This,int (*visit)(DLLQElemType **e));
-static int getHead(DLLQueue *This, DLLQElemType **e);
-static int enQueue(DLLQueue *This, DLLQElemType *e);
-static int deQueue(DLLQueue *This, DLLQElemType **e);
+static void riseTraverse(DLLQueue *This,int (*visit)(void **e));
+static void downTraverse(DLLQueue *This,int (*visit)(void **e));
+static int getHead(DLLQueue *This, void **e);
+static int enQueue(DLLQueue *This, void *e);
+static int deQueue(DLLQueue *This, void **e);
 
 DLLQueue *InitDLLQueue(){
 	DLLQueue *Q = (DLLQueue *)malloc(sizeof(DLLQueue));
@@ -77,7 +77,7 @@ static int length(DLLQueue *This){
 	return j;
 }
 
-static void riseTraverse(DLLQueue *This,int (*visit)(DLLQElemType **e)){
+static void riseTraverse(DLLQueue *This,int (*visit)(void **e)){
 	DLLQNode *p = This->front->next;
 	while(p){
 		if(visit(&(p->elem)) != 0) break;
@@ -85,7 +85,7 @@ static void riseTraverse(DLLQueue *This,int (*visit)(DLLQElemType **e)){
 	} 
 }
 
-static void downTraverse(DLLQueue *This,int (*visit)(DLLQElemType **e)){
+static void downTraverse(DLLQueue *This,int (*visit)(void **e)){
 	DLLQNode *p = This->tear;
 	while(p != This->front){
 		if(visit(&(p->elem)) != 0) break;
@@ -94,13 +94,13 @@ static void downTraverse(DLLQueue *This,int (*visit)(DLLQElemType **e)){
 }
 
 
-static int getHead(DLLQueue *This, DLLQElemType **e){
+static int getHead(DLLQueue *This, void **e){
 	if(isEmpty(This)) return -1;
 	*e = This->front->next->elem;
 	return 0;
 }
 
-static int enQueue(DLLQueue *This, DLLQElemType *e){
+static int enQueue(DLLQueue *This, void *e){
 	DLLQNode *p = This->tear;
 	DLLQNode *temp = (DLLQNode *)malloc(sizeof(DLLQNode));
 	if(!temp) return -1;
@@ -112,7 +112,7 @@ static int enQueue(DLLQueue *This, DLLQElemType *e){
 	return 0;
 }
 
-static int deQueue(DLLQueue *This, DLLQElemType **e){
+static int deQueue(DLLQueue *This, void **e){
 	if(This->front == This->tear){
 		*e = NULL;
 		return -1;
