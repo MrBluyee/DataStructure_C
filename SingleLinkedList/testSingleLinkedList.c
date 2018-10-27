@@ -13,6 +13,12 @@ int main(void){
 	list->print(list);
 	printf("list is empty:%d\n",list->isEmpty(list));
 	printf("list length:%d\n",list->length(list));
+	printf("reverse1 list :\n");
+	list->reverseList1(list); //迭代方式
+	list->print(list);
+	printf("reverse2 list :\n");
+	list->reverseList2(list); //迭代方式
+	list->print(list);
 	list->clear(list);
 	for (i = 10; i < 20; i++){
 		list->appendElem(list,&i);

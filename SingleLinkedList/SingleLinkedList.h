@@ -23,6 +23,8 @@ typedef struct SingleLinkedList{
 	int (*appendElem)(struct SingleLinkedList *This, ElemType *e);
 	int (*insertElem)(struct SingleLinkedList *This, int index, ElemType *e);
 	int (*popElem)(struct SingleLinkedList *This, ElemType* e);
+	int (*reverseList1)(struct SingleLinkedList *This);
+	int (*reverseList2)(struct SingleLinkedList *This);
 }SingleLinkedList;
 
 /* Exported macro ------------------------------------------------------------*/

@@ -13,6 +13,8 @@ static int deleteElem(SingleLinkedList *This, int index, ElemType* e);
 static int appendElem(SingleLinkedList *This, ElemType *e);
 static int insertElem(SingleLinkedList *This, int index, ElemType *e);
 static int popElem(SingleLinkedList *This, ElemType* e);
+static int reverseList1(SingleLinkedList *This);
+static int reverseList2(SingleLinkedList *This);
 
 SingleLinkedList *InitSingleLinkedList(){
 	SingleLinkedList *L = (SingleLinkedList *)malloc(sizeof(SingleLinkedList));
@@ -30,6 +32,8 @@ SingleLinkedList *InitSingleLinkedList(){
 	L->appendElem = appendElem;
 	L->insertElem = insertElem;
 	L->popElem = popElem;
+	L->reverseList1 = reverseList1;
+	L->reverseList2 = reverseList2;
 	return L;
 }
 
@@ -179,3 +183,37 @@ static int popElem(SingleLinkedList *This, ElemType* e){
 	return 0;
 }
 
+//迭代方式
+static int reverseList1(SingleLinkedList *This){
+	Node *p = This->This->next;
+	if (p == NULL || p->next == NULL) return -1;
+	Node *temp = NULL, *newH = NULL;
+	while (p != NULL){
+		temp = p->next;
+		p->next = newH;
+		newH = p;
+		p = temp;
+	}
+	This->This->next = newH;
+	return 0;
+}
+
+//递归方式
+static Node *ReverseList2(Node *head){
+	if (head == NULL || head->next == NULL){
+		return head;
+	}else{
+		Node *temp = head->next, *newH = NULL;
+		head->next = NULL;
+		newH = ReverseList2(temp);
+		temp->next = head;
+		return newH;
+	}
+}
+
+static int reverseList2(SingleLinkedList *This){
+	Node *p = This->This->next;
+	if (p == NULL || p->next == NULL) return -1;
+	This->This->next = ReverseList2(p);
+	return 0;
+}
