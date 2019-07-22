@@ -100,6 +100,7 @@ BigInt *BigIntInit(char *num, unsigned long long str_len){
 			num_dec_index++;
 		}
 	}
+	big_int->zeropad = 0;
 	return big_int;
 }
 
@@ -123,14 +124,19 @@ void BigIntPrintNode(BigInt *big_int_node){
 	int temp;
 	if(!big_int_node) return;
 	if(!big_int_node->elem) return;
-	printf("%d", *(big_int_node->elem));
-	for(int i = 1; i < big_int_node->elem_num; i++){
+	printf("%d", *(big_int_node->elem)); //首
+	for(int i = 1; i < big_int_node->elem_num - 1; i++){
 		temp = *(big_int_node->elem + i);
 		if(temp > 999999999){  //实际存放数值可大于9位
 			printf("%d", temp);
 		}else{
 			printf("%09d", temp);
 		}
+	}
+	if(big_int_node->zeropad){ //尾
+		printf("%09d", *(big_int_node->elem + big_int_node->elem_num - 1));
+	}else{
+		printf("%d", *(big_int_node->elem + big_int_node->elem_num - 1));
 	}
 }
 
@@ -157,19 +163,13 @@ void BigIntCat(BigInt *big_hi, BigInt *big_lo){
 	big_hi_tear->lower = big_lo;
 }
 
-BigInt *BigIntSubBigInt(BigInt *big_int, unsigned long long start_index){
+BigInt *BigIntSplit(BigInt *big_int, unsigned long long split_index){
 
 }
 
 
 void BigIntDestroy(BigInt *big_int){
-	if(big_int->elem){
-		free(big_int->elem);
-	}
-	if(big_int){
-		free(big_int);
-	}
-	big_int = NULL;
+	
 }
 
 BigInt *BigIntUnsignAdd(BigInt *big_a, BigInt *big_b){
