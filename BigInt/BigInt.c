@@ -169,7 +169,18 @@ BigInt *BigIntSplit(BigInt *big_int, unsigned long long split_index){
 
 
 void BigIntDestroy(BigInt *big_int){
-	
+	BigInt *big_int_node;
+	BigInt *big_int_index;
+	if(!big_int) return;
+	big_int_node = BigIntFindHead(big_int);
+	while(big_int_node){
+		if(big_int_node->elem){
+			free(big_int_node->elem);
+		}
+		big_int_index = big_int_node->lower;
+        free(big_int_node);
+        big_int_node = big_int_index;
+	}
 }
 
 BigInt *BigIntUnsignAdd(BigInt *big_a, BigInt *big_b){
