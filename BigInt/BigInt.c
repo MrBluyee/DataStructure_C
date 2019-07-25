@@ -2,31 +2,19 @@
 #include <malloc.h>
 #include "BigInt.h"
 
-unsigned long long StrLen(char *num){
-	unsigned long long i = 0;
+unsigned int StrLen(char *num){
+	unsigned int i = 0;
 	while(*(num + i) != '\0'){
 		i++;
 	}
 	return i;
 }
 
-int Pow10(int x){
-	int result = 1;
-	for (int i = 1; i < x; ++i)
-	{
-		result *= 10;
-	}
-	return result;
-}
-
-BigInt *BigIntInit(char *num, unsigned long long str_len){
+BigInt *BigIntInit(char *num, unsigned int str_len){
 	
 	BigInt *big_int = NULL;
-	unsigned long long num_dec_len; //大数的十进制位数
-	unsigned long long num_dec_index = 0; //十进制数的游标
-	unsigned char big_elem_remain; 
-	unsigned long long big_elem_len;
-	unsigned long long big_elem_index = 0; //big elem的游标
+	unsigned int num_len; //大数的十进制位数
+	unsigned int num_index = 0; //十进制数的游标
 
 	if((!num) || (str_len == 0)) return NULL;
 	if(str_len > StrLen(num)){
@@ -40,41 +28,32 @@ BigInt *BigIntInit(char *num, unsigned long long str_len){
 	big_int->lower = NULL;
 
 	if(*num == '-'){
-		num_dec_len = str_len - 1;
+		num_len = str_len - 1;
 		big_int->sign = -1;
-		num_dec_index = 1;
+		num_index = 1;
 	}else if(*num == '+'){
-		num_dec_len = str_len - 1;
+		num_len = str_len - 1;
 		big_int->sign = 1;
-		num_dec_index = 1;
+		num_index = 1;
 	}else if((*num >= '0') && (*num <= '9')){
-		num_dec_len = str_len;
+		num_len = str_len;
 		big_int->sign = 1;
-		num_dec_index = 0;
+		num_index = 0;
 	}else{
 		printf("error format!\n");
 		free(big_int);
 		return NULL;
 	}
 
-	//从char*转为BigInt时，限定每个int elem 最多存放9位十进制长度的数值。
-	//每个int elem 存放9位十进制长度能够保证完全放下。
-	big_elem_remain = num_dec_len % 9;
-	big_elem_len = num_dec_len / 9;
-	big_int->elem_num = big_elem_len;
-	if(big_elem_remain != 0){
-		big_int->elem_num++;
-		big_elem_index = 1;
-	}
-	big_int->elem = (unsigned int *)malloc(big_elem_len*sizeof(unsigned int));
+	big_int->elem_num = num_len;
+	big_int->elem = (char *)malloc(big_elem_len*sizeof(char));
 	if(!big_int->elem){
 		free(big_int);
 		return NULL;
 	}
-	*(big_int->elem) = 0;
-	for (int i = 0; i < big_elem_remain; i++){
+	for (int i = 0; i < num_len; i++){
 		if((*(num + i) >= '0') && (*(num + i) <= '9')){
-			(*(big_int->elem)) += ((*(num + i) - '0') * Pow10(big_elem_remain - i));
+			*(big_int->elem + i) = *(num + i) - '0';
 		}else{
 			free(big_int->elem);
 			free(big_int);
@@ -83,24 +62,6 @@ BigInt *BigIntInit(char *num, unsigned long long str_len){
 			break;
 		}
 	}
-	if(!big_int) return NULL;
-	num_dec_index += big_elem_remain;
-	for (; big_elem_index < big_int->elem_num; big_elem_index++)
-	{
-		for(int j = 0; j < 9; j++){
-			if((*(num + num_dec_index) >= '0') && (*(num + num_dec_index) <= '9')){
-				*(big_int->elem + big_elem_index) += ((*(num + num_dec_index) - '0') * Pow10(9 - j));
-			}else{
-				free(big_int->elem);
-				free(big_int);
-				big_int = NULL;
-				printf("error format!\n");
-				break;
-			}
-			num_dec_index++;
-		}
-	}
-	big_int->zeropad = 0;
 	return big_int;
 }
 
@@ -121,22 +82,10 @@ BigInt *BigIntFindTear(BigInt *big_int_node){
 }
 
 void BigIntPrintNode(BigInt *big_int_node){
-	int temp;
 	if(!big_int_node) return;
 	if(!big_int_node->elem) return;
-	printf("%d", *(big_int_node->elem)); //首
-	for(int i = 1; i < big_int_node->elem_num - 1; i++){
-		temp = *(big_int_node->elem + i);
-		if(temp > 999999999){  //实际存放数值可大于9位
-			printf("%d", temp);
-		}else{
-			printf("%09d", temp);
-		}
-	}
-	if(big_int_node->zeropad){ //尾
-		printf("%09d", *(big_int_node->elem + big_int_node->elem_num - 1));
-	}else{
-		printf("%d", *(big_int_node->elem + big_int_node->elem_num - 1));
+	for(int i = 0; i < big_int_node->elem_num; i++){
+		printf("%d", *(big_int_node->elem + i));	
 	}
 }
 
@@ -154,6 +103,18 @@ void BigIntPrint(BigInt *big_int){
 	printf("\n");
 }
 
+unsigned long long BigIntGetLen(BigInt *big_int){
+	BigInt *big_node_index;
+	unsigned long long big_int_len;
+	if(!big_int) return 0;
+	big_int_len = big_int->elem_num;
+	while(big_node_index->lower){
+		big_int_len += big_node_index->lower->elem_num;
+		big_node_index = big_node_index->lower;
+	}
+	return big_int_len;
+}
+
 //big_hi + big_lo -> big_hi
 void BigIntCat(BigInt *big_hi, BigInt *big_lo){
 	BigInt *big_hi_tear;
@@ -163,7 +124,59 @@ void BigIntCat(BigInt *big_hi, BigInt *big_lo){
 	big_hi_tear->lower = big_lo;
 }
 
-BigInt *BigIntSplit(BigInt *big_int, unsigned long long split_index){
+int _BigIntCmpWithSameLen(BigInt *big_a, BigInt *big_b, unsigned long long big_len){
+	unsigned long long big_a_acc = 0;
+	unsigned long long big_b_acc = 0;
+	int result = 0;
+	BigInt *big_a_index = big_a;
+	BigInt *big_b_index = big_b;
+	for (unsigned long long i = 0; i < big_len; ++i)
+	{
+		unsigned int j = i - big_a_acc;
+		unsigned int k = i - big_b_acc;
+		if(j >= big_a_index->elem_num){
+			big_a_acc += big_a_index->elem_num;
+			big_a_index = big_a_index->lower;
+			j = 0;
+		}
+		if(k >= big_b_index->elem_num){
+			big_b_acc += big_b_index->elem_num;
+			big_b_index = big_b_index->lower;	
+			k = 0;		
+		}
+
+		if(*(big_a_index->elem + j) > *(big_b_index->elem + k)){
+			result = 1;
+			break;
+		}else if(*(big_a_index->elem + j) < *(big_b_index->elem + k)){
+			result = -1;
+			break;	
+		}
+	}
+	return result;
+}
+
+int BigIntCmp(BigInt *big_a, BigInt *big_b){
+	unsigned long long big_a_len;
+	unsigned long long big_b_len;
+	int result;
+	big_a_len = BigIntGetLen(big_a);
+	big_b_len = BigIntGetLen(big_b);
+	if(big_a_len > big_b_len){
+		return 1;
+	}else if(big_a_len < big_b_len){
+		return -1;
+	}else{
+		if(big_a_len == 0){
+			return 0;
+		}else{
+			result = _BigIntCmpWithSameLen(big_a, big_b, big_a_len);
+		}
+	}
+	return result; 
+}
+
+BigInt *BigIntSplit(BigInt *big_int, unsigned int split_index){
 
 }
 
@@ -183,24 +196,27 @@ void BigIntDestroy(BigInt *big_int){
 	}
 }
 
-BigInt *BigIntUnsignAdd(BigInt *big_a, BigInt *big_b){
-	BigInt *result;
-	unsigned long long elem_add_len;
-	if((!big_a) || (!big_b)) return NULL;
-	if((!big_a->elem) || (!big_b->elem)) return NULL;
+int BigIntUnsignAddNode(BigInt *result, BigInt *big_a, BigInt *big_b, int carry){
+	BigInt *result_index;
+	unsigned int elem_index;
+	unsigned int interval;
+	int result_carry = carry;
+
+	if((!big_a) || (!big_b)) return 0;
+	if((!big_a->elem) || (!big_b->elem)) return 0;
+	if(result){
+		if(result->elem) free(result->elem);
+		free(result);
+	}
+
 	result = (BigInt *)malloc(sizeof(BigInt));
-	if(!result) return NULL;
-	if(big_a->elem_num > big_b->elem_num){
-		elem_add_len = big_b->elem_num;
-		result->elem_num = big_a->elem_num;
-	}else if(big_a->elem_num == big_b->elem_num){
-		elem_add_len = big_a->elem_num;
-		result->elem_num = big_a->elem_num;
-	}
-	
-	for (unsigned long long i = 0; i < elem_add_len; ++i){
-		
-	}
+	if(!result_index){
+		return 0; 
+	} 
+	result->higher = NULL;
+	result->lower = NULL;
+
+	return result_carry;
 }
 
 BigInt *BigIntUnsignSub(BigInt *big_a, BigInt *big_b){
