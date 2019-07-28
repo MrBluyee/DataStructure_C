@@ -176,10 +176,53 @@ int BigIntCmp(BigInt *big_a, BigInt *big_b){
 	return result; 
 }
 
-BigInt *BigIntSplit(BigInt *big_int, unsigned int split_index){
-
+BigInt *BigIntSplitNode(BigInt *big_int, unsigned int split_index){
+	BigInt *big_new_node;
+	if(!big_int) return NULL;
+	if(big_int->elem_num <= split_index) return NULL;
+	if(split_index == 0){
+		big_new_node = big_int;
+		big_int = NULL;
+		return big_new_node;
+	}
+	big_new_node = (BigInt *)malloc(sizeof(BigInt));
+	if(!big_new_node) return NULL;
+	big_new_node->elem_num = big_int->elem_num - split_index;
+	big_new_node->num = (char *)malloc(big_new_node->elem_num * sizeof(char));
+	if(!big_new_node->num){
+		free(big_new_node);
+		return NULL;
+	}
+	for (unsigned int i = split_index; i < big_int->elem_num ; ++i){
+		*(big_new_node->num + i - split_index) = *(big_int->num + i);
+	}
+	big_new_node->lower = big_int->lower;
+	big_new_node->higher = NULL;
+	big_int->elem_num = split_index;
+	big_int->num = realloc(big_int->num, split_index);
+	big_int->lower = NULL;
+	return big_new_node;
 }
 
+BigInt *BigIntSplit(BigInt *big_int, unsigned long long split_index){
+	BigInt *big_new_node;
+	unsigned long long big_int_len;
+	unsigned int node_split_index;
+	if(!big_int) return NULL;
+	big_int_len = BigIntGetLen(big_int);
+	if(big_int_len <= split_index) return NULL;
+	if(split_index == 0){
+		big_new_node = big_int;
+		big_int = NULL;
+		return big_new_node;		
+	}
+	big_int_len = big_int->elem_num;
+	big_new_node = big_int;
+	while(split_index >= big_int_len){
+		big_int_len += big_new_node->elem_num;
+		big_new_node = big_new_node->lower;
+	}
+}
 
 void BigIntDestroy(BigInt *big_int){
 	BigInt *big_int_node;
