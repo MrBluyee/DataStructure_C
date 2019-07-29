@@ -206,6 +206,7 @@ BigInt *BigIntSplitNode(BigInt *big_int, unsigned int split_index){
 
 BigInt *BigIntSplit(BigInt *big_int, unsigned long long split_index){
 	BigInt *big_new_node;
+	BigInt *big_node_index;
 	unsigned long long big_int_len;
 	unsigned int node_split_index;
 	if(!big_int) return NULL;
@@ -217,11 +218,15 @@ BigInt *BigIntSplit(BigInt *big_int, unsigned long long split_index){
 		return big_new_node;		
 	}
 	big_int_len = big_int->elem_num;
-	big_new_node = big_int;
+	big_node_index = big_int;
 	while(split_index >= big_int_len){
 		big_int_len += big_new_node->elem_num;
-		big_new_node = big_new_node->lower;
+		big_node_index = big_new_node->lower;
 	}
+	node_split_index = big_int_len - split_index;
+	node_split_index = big_node_index->elem_num - node_split_index;
+	big_new_node = BigIntSplitNode(big_node_index, node_split_index);
+	return big_new_node;
 }
 
 void BigIntDestroy(BigInt *big_int){
@@ -239,13 +244,30 @@ void BigIntDestroy(BigInt *big_int){
 	}
 }
 
-int BigIntUnsignAddNode(BigInt *result, BigInt *big_a, BigInt *big_b, int carry){
+BigInt *BigIntUnsignAdd(BigInt *big_a, BigInt *big_b){
+	BigInt *result;
 	BigInt *result_index;
-	unsigned int elem_index;
-	unsigned int interval;
-	int result_carry = carry;
+	BigInt *big_a_node;
+	BigInt *big_b_node;
+	unsigned long long big_a_index;
+	unsigned long long big_b_index;
 
-	if((!big_a) || (!big_b)) return 0;
+	unsigned int big_a_elem_index;
+	unsigned int big_b_elem_index;
+
+	if((!big_a) || (!big_b)) return NULL;
+
+	big_a_node = BigIntFindTear(big_a);
+	big_b_node = BigIntFindTear(big_b);
+	big_a_elem_index = big_a_node->elem_num - 1;
+	big_b_elem_index = big_b_node->elem_num - 1;
+
+	while((big_a_node =! NULL) && (big_b_node =! NULL)){
+		
+		big_a_node = big_a_node->higher;
+		big_b_node = big_b_node->higher;
+	}
+
 	if((!big_a->elem) || (!big_b->elem)) return 0;
 	if(result){
 		if(result->elem) free(result->elem);
@@ -253,7 +275,7 @@ int BigIntUnsignAddNode(BigInt *result, BigInt *big_a, BigInt *big_b, int carry)
 	}
 
 	result = (BigInt *)malloc(sizeof(BigInt));
-	if(!result_index){
+	if(!result_index){ 
 		return 0; 
 	} 
 	result->higher = NULL;
