@@ -244,48 +244,268 @@ void BigIntDestroy(BigInt *big_int){
 	}
 }
 
-BigInt *BigIntUnsignAdd(BigInt *big_a, BigInt *big_b){
+BigInt *BigIntUnsignAdd(BigInt *big_a, BigInt *big_b, unsigned char lo_carry){
 	BigInt *result;
-	BigInt *result_index;
+	BigInt *result_append;
 	BigInt *big_a_node;
 	BigInt *big_b_node;
-	unsigned long long big_a_index;
-	unsigned long long big_b_index;
 
+	unsigned long long big_a_len;
+	unsigned long long big_b_len;	
+	unsigned long long result_len;	
+
+	unsigned int result_index;
 	unsigned int big_a_elem_index;
 	unsigned int big_b_elem_index;
 
+	unsigned char carry = lo_carry;
+	unsigned char temp = 0;
+
 	if((!big_a) || (!big_b)) return NULL;
+
+	result = (BigInt *)malloc(sizeof(BigInt));
+	if(!result){ 
+		return NULL;
+	} 
+
+	result->lower = NULL;
 
 	big_a_node = BigIntFindTear(big_a);
 	big_b_node = BigIntFindTear(big_b);
-	big_a_elem_index = big_a_node->elem_num - 1;
-	big_b_elem_index = big_b_node->elem_num - 1;
+	big_a_len = BigIntGetLen(big_a);
+	big_b_len = BigIntGetLen(big_b);
 
-	while((big_a_node =! NULL) && (big_b_node =! NULL)){
-		
-		big_a_node = big_a_node->higher;
-		big_b_node = big_b_node->higher;
+	if(big_a_len > big_b_len){
+		result_len = big_a_len;
+	}else{
+		result_len = big_b_len;
 	}
 
-	if((!big_a->elem) || (!big_b->elem)) return 0;
-	if(result){
-		if(result->elem) free(result->elem);
+	if(result_len > 0xFFFFFFFF){
+		result->elem_num = 0xFFFFFFFF;
+		result->elem = (char *)malloc(result->elem_num * sizeof(char));
+		result_len -= 0xFFFFFFFF;
+	}else{
+		result->elem_num = result_len;
+		result->elem = (char *)malloc(result->elem_num * sizeof(char));
+	}
+	if(!result->elem){
 		free(result);
+		return NULL;
 	}
+
+	result_index = result->elem_num;
+	big_a_elem_index = big_a_node->elem_num;
+	big_b_elem_index = big_b_node->elem_num;
+
+	while((big_a_node != NULL) && (big_b_node != NULL)){
+		big_a_elem_index--;
+		big_b_elem_index--;
+		result_index--;
+
+		temp = *(big_a_node + big_a_elem_index) + *(big_b_node + big_b_elem_index) + carry;
+		if(temp > 10){
+			*(result->elem + result_index) = temp - 10;
+			carry = 1;
+		}else{
+			*(result->elem + result_index) = temp;
+			carry = 0;
+		} 
+
+		if(result_index == 0){
+			result_append = (BigInt *)malloc(sizeof(BigInt));
+			if(!result_append){
+				BigIntDestroy(result);
+				return NULL;
+			}
+			if(result_len > 0xFFFFFFFF){
+				result_append->elem_num = 0xFFFFFFFF;
+				result_append->elem = (char *)malloc(result_append->elem_num * sizeof(char));
+				result_len -= 0xFFFFFFFF;
+			}else{
+				result_append->elem_num = result_len;
+				result_append->elem = (char *)malloc(result_append->elem_num * sizeof(char));
+			}
+			if(!result->elem){
+				BigIntDestroy(result);
+				free(result_append);
+				return NULL;
+			}
+			result_index = result_append->elem_num;
+			result->higher = result_append;
+			result_append->lower = result;
+			result = result_append;
+		}
+
+		if(big_a_elem_index == 0){
+			big_a_node = big_a_node->higher;
+			if(big_a_node){
+				big_a_elem_index = big_a_node->elem_num;
+			}
+			
+		}
+		if(big_b_elem_index == 0){
+			big_b_node = big_b_node->higher;
+			if(big_b_node){
+				big_b_elem_index = big_b_node->elem_num;	
+			} 	
+		}
+	}
+
+	while(big_a_node != NULL){
+		big_a_elem_index--;
+		result_index--;
+		temp = *(big_a_node + big_a_elem_index) + carry;
+		if(temp > 10){
+			*(result->elem + result_index) = temp - 10;
+			carry = 1;
+		}else{
+			*(result->elem + result_index) = temp;
+			carry = 0;
+		} 		
+
+		if(result_index == 0){
+			result_append = (BigInt *)malloc(sizeof(BigInt));
+			if(!result_append){
+				BigIntDestroy(result);
+				return NULL;
+			}
+			if(result_len > 0xFFFFFFFF){
+				result_append->elem_num = 0xFFFFFFFF;
+				result_append->elem = (char *)malloc(result_append->elem_num * sizeof(char));
+				result_len -= 0xFFFFFFFF;
+			}else{
+				result_append->elem_num = result_len;
+				result_append->elem = (char *)malloc(result_append->elem_num * sizeof(char));
+			}
+			if(!result->elem){
+				BigIntDestroy(result);
+				free(result_append);
+				return NULL;
+			}
+			result_index = result_append->elem_num;
+			result->higher = result_append;
+			result_append->lower = result;
+			result = result_append;
+		}
+
+		if(big_a_elem_index == 0){
+			big_a_node = big_a_node->higher;
+			if(big_a_node){
+				big_a_elem_index = big_a_node->elem_num;
+			}
+		}			
+	}
+
+	while(big_b_node != NULL){
+		big_b_elem_index--;
+		result_index--;
+		temp = *(big_b_node + big_b_elem_index) + carry;
+		if(temp > 10){
+			*(result->elem + result_index) = temp - 10;
+			carry = 1;
+		}else{
+			*(result->elem + result_index) = temp;
+			carry = 0;
+		} 	
+
+		if(result_index == 0){
+			result_append = (BigInt *)malloc(sizeof(BigInt));
+			if(!result_append){
+				BigIntDestroy(result);
+				return NULL;
+			}
+			if(result_len > 0xFFFFFFFF){
+				result_append->elem_num = 0xFFFFFFFF;
+				result_append->elem = (char *)malloc(result_append->elem_num * sizeof(char));
+				result_len -= 0xFFFFFFFF;
+			}else{
+				result_append->elem_num = result_len;
+				result_append->elem = (char *)malloc(result_append->elem_num * sizeof(char));
+			}
+			if(!result->elem){
+				BigIntDestroy(result);
+				free(result_append);
+				return NULL;
+			}
+			result_index = result_append->elem_num;
+			result->higher = result_append;
+			result_append->lower = result;
+			result = result_append;
+		}	
+
+		if(big_b_elem_index == 0){
+			big_b_node = big_b_node->higher;
+			if(big_b_node){
+				big_b_elem_index = big_b_node->elem_num;	
+			}		
+		}	
+
+	}
+
+	if(carry == 1){
+		result_append = (BigInt *)malloc(sizeof(BigInt));
+		if(!result_append){
+			BigIntDestroy(result);
+			return NULL;
+		}
+		result_append->elem_num = 1;
+		result_append->elem = (char *)malloc(result_append->elem_num * sizeof(char));
+		if(!result_append->elem){
+			BigIntDestroy(result);
+			free(result_append);
+			return NULL;			
+		}
+		*(result_append->elem) = 1;
+		result_append->higher =	NULL;
+		result_append->lower = result;
+		result->higher = result_append;
+		return result_append;
+	}else{
+		result->higher = NULL;
+		return result;
+	}
+}
+
+
+//big_a - big_b
+//assume big_a > big_b
+BigInt *BigIntUnsignSub(BigInt *big_a, BigInt *big_b){
+	BigInt *result;
+	BigInt *big_a_node;
+	BigInt *big_b_node;
+
+	unsigned long long big_a_len;
+	unsigned long long big_b_len;	
+	unsigned long long result_len;
+
+	unsigned int big_a_elem_index;
+	unsigned int big_b_elem_index;
+	unsigned int result_index;
+
+	unsigned char carry = 0;
+	unsigned char temp = 0;
+
+	if((!big_a) || (!big_b)) return NULL;
 
 	result = (BigInt *)malloc(sizeof(BigInt));
-	if(!result_index){ 
-		return 0; 
+	if(!result){ 
+		return NULL;
 	} 
+
 	result->higher = NULL;
 	result->lower = NULL;
 
-	return result_carry;
-}
+	big_a_len = BigIntGetLen(big_a);
+	big_b_len = BigIntGetLen(big_b);
 
-BigInt *BigIntUnsignSub(BigInt *big_a, BigInt *big_b){
-	BigInt *result;
+	result->elem_num = big_a_len;
+	result_index = big_a_len - big_b_len; 
+	result->elem = (char *)malloc(result->elem_num * sizeof(char));
+	if(!result->elem){
+		free(result);
+		return NULL;
+	}
 }
 
 
