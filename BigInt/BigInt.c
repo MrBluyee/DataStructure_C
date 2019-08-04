@@ -91,10 +91,29 @@ void BigIntPrintNode(BigInt *big_int_node){
 
 void BigIntPrint(BigInt *big_int){
 	BigInt *big_node_index = big_int;
+	unsigned int zero_head_index = 0;
 	if(!big_int) return;
 	if(!big_int->elem) return;
 	if(big_int->sign == -1){
 		printf("-");
+	}
+	while(*(big_node_index + zero_head_index) == 0){
+		zero_head_index ++;
+		if(zero_head_index == big_node_index->elem_num){
+			big_node_index = big_node_index->lower;
+			zero_head_index = 0;
+			if(!big_node_index){
+				printf("0");
+				break;
+			} 
+		}
+	}
+	if((big_node_index) && (zero_head_index != 0)){
+		while(zero_head_index < big_node_index->elem_num){
+			printf("%d", *(big_node_index->elem + zero_head_index));	
+			zero_head_index ++;
+		}
+		big_node_index = big_node_index->lower;
 	}
 	while(big_node_index){
 		BigIntPrintNode(big_node_index);
@@ -156,7 +175,7 @@ int _BigIntCmpWithSameLen(BigInt *big_a, BigInt *big_b, unsigned long long big_l
 	return result;
 }
 
-int BigIntCmp(BigInt *big_a, BigInt *big_b){
+int BigIntUnsignedCmp(BigInt *big_a, BigInt *big_b){
 	unsigned long long big_a_len;
 	unsigned long long big_b_len;
 	int result;
@@ -174,6 +193,38 @@ int BigIntCmp(BigInt *big_a, BigInt *big_b){
 		}
 	}
 	return result; 
+}
+
+int BigIntCmp(BigInt *big_a, BigInt *big_b){
+	int result;
+	if((big_a) && (!big_b)) return 1;
+	if((!big_a) && (big_b)) return -1;
+	if((!big_a) && (!big_b)) return 0;
+
+	if(big_a->sign == big_b->sign){
+		result = BigIntUnsignedCmp(big_a, big_b);
+		if(big_a->sign == -1){
+			result = -result;
+		}
+	}else{
+		if(big_a->sign == 1){
+			result = 1;
+		}else{
+			result = -1;
+		}
+	}
+	return result; 
+}
+
+BigInt *BigIntCopy(BigInt *big_int){
+	BigInt *result;
+	BigInt *result_node;
+	BigInt *big_int_node = big_int;
+	if(!big_int) return NULL;
+	while(big_int_node){
+		big_int_node = big_int_node->lower;
+	}
+
 }
 
 BigInt *BigIntSplitNode(BigInt *big_int, unsigned int split_index){
@@ -244,7 +295,7 @@ void BigIntDestroy(BigInt *big_int){
 	}
 }
 
-BigInt *BigIntUnsignAdd(BigInt *big_a, BigInt *big_b, unsigned char lo_carry){
+BigInt *BigIntUnsignedAdd(BigInt *big_a, BigInt *big_b, unsigned char lo_carry){
 	BigInt *result;
 	BigInt *result_append;
 	BigInt *big_a_node;
@@ -259,7 +310,7 @@ BigInt *BigIntUnsignAdd(BigInt *big_a, BigInt *big_b, unsigned char lo_carry){
 	unsigned int big_b_elem_index;
 
 	unsigned char carry = lo_carry;
-	unsigned char temp = 0;
+	char temp = 0;
 
 	if((!big_a) || (!big_b)) return NULL;
 
@@ -467,24 +518,24 @@ BigInt *BigIntUnsignAdd(BigInt *big_a, BigInt *big_b, unsigned char lo_carry){
 	}
 }
 
-
 //big_a - big_b
 //assume big_a > big_b
-BigInt *BigIntUnsignSub(BigInt *big_a, BigInt *big_b){
+BigInt *BigIntUnsignedSub(BigInt *big_a, BigInt *big_b, unsigned char lo_carry){
 	BigInt *result;
+	BigInt *result_append;
 	BigInt *big_a_node;
 	BigInt *big_b_node;
 
 	unsigned long long big_a_len;
 	unsigned long long big_b_len;	
-	unsigned long long result_len;
+	unsigned long long result_len;	
 
+	unsigned int result_index;
 	unsigned int big_a_elem_index;
 	unsigned int big_b_elem_index;
-	unsigned int result_index;
 
-	unsigned char carry = 0;
-	unsigned char temp = 0;
+	unsigned char carry = lo_carry;
+	char temp = 0;
 
 	if((!big_a) || (!big_b)) return NULL;
 
@@ -493,21 +544,190 @@ BigInt *BigIntUnsignSub(BigInt *big_a, BigInt *big_b){
 		return NULL;
 	} 
 
-	result->higher = NULL;
 	result->lower = NULL;
 
+	big_a_node = BigIntFindTear(big_a);
+	big_b_node = BigIntFindTear(big_b);
 	big_a_len = BigIntGetLen(big_a);
 	big_b_len = BigIntGetLen(big_b);
+	result_len = big_a_len;
 
-	result->elem_num = big_a_len;
-	result_index = big_a_len - big_b_len; 
-	result->elem = (char *)malloc(result->elem_num * sizeof(char));
+	if(result_len > 0xFFFFFFFF){
+		result->elem_num = 0xFFFFFFFF;
+		result->elem = (char *)malloc(result->elem_num * sizeof(char));
+		result_len -= 0xFFFFFFFF;
+	}else{
+		result->elem_num = result_len;
+		result->elem = (char *)malloc(result->elem_num * sizeof(char));
+	}
 	if(!result->elem){
 		free(result);
 		return NULL;
 	}
+
+	result_index = result->elem_num;
+	big_a_elem_index = big_a_node->elem_num;
+	big_b_elem_index = big_b_node->elem_num;
+
+	while((big_a_node != NULL) && (big_b_node != NULL)){
+		big_a_elem_index--;
+		big_b_elem_index--;
+		result_index--;
+
+		temp = *(big_a_node + big_a_elem_index) - carry;
+
+		if(temp < *(big_b_node + big_b_elem_index)){
+			temp += 10 - *(big_b_node + big_b_elem_index);
+			carry = 1;
+		}else{
+			temp -= *(big_b_node + big_b_elem_index);
+			carry = 0;
+		}
+		*(result->elem + result_index) = temp;
+
+		if(result_index == 0){
+			result_append = (BigInt *)malloc(sizeof(BigInt));
+			if(!result_append){
+				BigIntDestroy(result);
+				return NULL;
+			}
+			if(result_len > 0xFFFFFFFF){
+				result_append->elem_num = 0xFFFFFFFF;
+				result_append->elem = (char *)malloc(result_append->elem_num * sizeof(char));
+				result_len -= 0xFFFFFFFF;
+			}else{
+				result_append->elem_num = result_len;
+				result_append->elem = (char *)malloc(result_append->elem_num * sizeof(char));
+			}
+			if(!result->elem){
+				BigIntDestroy(result);
+				free(result_append);
+				return NULL;
+			}
+			result_index = result_append->elem_num;
+			result->higher = result_append;
+			result_append->lower = result;
+			result = result_append;
+		}
+
+		if(big_a_elem_index == 0){
+			big_a_node = big_a_node->higher;
+			if(big_a_node){
+				big_a_elem_index = big_a_node->elem_num;
+			}
+			
+		}
+		if(big_b_elem_index == 0){
+			big_b_node = big_b_node->higher;
+			if(big_b_node){
+				big_b_elem_index = big_b_node->elem_num;	
+			} 	
+		}
+	}
+
+	while(big_a_node != NULL){
+		big_a_elem_index--;
+		result_index--;
+		temp = *(big_a_node + big_a_elem_index) - carry;
+		if(temp < 0){
+			*(result->elem + result_index) = temp + 10;
+			carry = 1;
+		}else{
+			*(result->elem + result_index) = temp;
+			carry = 0;
+		} 		
+
+		if(result_index == 0){
+			result_append = (BigInt *)malloc(sizeof(BigInt));
+			if(!result_append){
+				BigIntDestroy(result);
+				return NULL;
+			}
+			if(result_len > 0xFFFFFFFF){
+				result_append->elem_num = 0xFFFFFFFF;
+				result_append->elem = (char *)malloc(result_append->elem_num * sizeof(char));
+				result_len -= 0xFFFFFFFF;
+			}else{
+				result_append->elem_num = result_len;
+				result_append->elem = (char *)malloc(result_append->elem_num * sizeof(char));
+			}
+			if(!result->elem){
+				BigIntDestroy(result);
+				free(result_append);
+				return NULL;
+			}
+			result_index = result_append->elem_num;
+			result->higher = result_append;
+			result_append->lower = result;
+			result = result_append;
+		}
+
+		if(big_a_elem_index == 0){
+			big_a_node = big_a_node->higher;
+			if(big_a_node){
+				big_a_elem_index = big_a_node->elem_num;
+			}
+		}			
+	}
+	result->higher = NULL;
+	return result;
 }
 
+BigInt *BigIntAdd(BigInt *big_a, BigInt *big_b){
+	BigInt *result;
+
+	if((big_a) && (!big_b)) return big_a;
+	if((!big_a) && (big_b)) return big_b;
+	if((!big_a) && (!big_b)) return NULL;
+
+	if(big_a->sign == big_b->sign){
+		result = BigIntUnsignedAdd(big_a, big_b, 0);
+		if(!result) return NULL;
+		if(big_a->sign == -1){
+			result->sign = -1;
+		}else{
+			result->sign = 1;
+		}
+	}else{
+		if(big_a->sign == 1){
+			if(BigIntUnsignedCmp(big_a, big_b) >= 0){
+				result = BigIntUnsignedSub(big_a, big_b, 0);
+				if(!result) return NULL;
+				result->sign = 1;
+			}else{
+				result = BigIntUnsignedSub(big_b, big_a, 0);
+				if(!result) return NULL;
+				result->sign = -1;				
+			}
+		}else{
+			if(BigIntUnsignedCmp(big_a, big_b) > 0){
+				result = BigIntUnsignedSub(big_a, big_b, 0);
+				if(!result) return NULL;
+				result->sign = -1;	
+			}else{
+				result = BigIntUnsignedSub(big_b, big_a, 0);
+				if(!result) return NULL;
+				result->sign = 1;					
+			}		
+		}
+	}
+	return result;
+}
+
+BigInt *BigIntSub(BigInt *big_a, BigInt *big_b){
+	BigInt *result;
+
+	if((big_a) && (!big_b)) return big_a;
+	if((!big_a) && (big_b)) return big_b;
+	if((!big_a) && (!big_b)) return NULL;
+
+
+	if(big_a->sign == 1){
+		if()
+	}else{
+
+	}
+}
 
 int main(int argc, char *argv[]){
 	char *big_int_char;
