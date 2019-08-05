@@ -218,13 +218,43 @@ int BigIntCmp(BigInt *big_a, BigInt *big_b){
 
 BigInt *BigIntCopy(BigInt *big_int){
 	BigInt *result;
-	BigInt *result_node;
+	BigInt *result_node1;
+	BigInt *result_node2;
 	BigInt *big_int_node = big_int;
 	if(!big_int) return NULL;
+	result = (BigInt *)malloc(sizeof(BigInt));
+	if(!result){ 
+		return NULL;
+	} 
+	result->higher = NULL;
+	result->sign = big_int->sign;
+	result_node1 = result;
 	while(big_int_node){
+		result_node1->elem_num = big_int_node->elem_num;
+		result_node1->elem = (char *)malloc(result_node1->elem_num * sizeof(char));
+		if(!result_node1->elem){
+			result_node1 = BigIntFindHead(result_node1);
+			BigIntDestroy(result_node1);
+			result = NULL;
+			break;
+		}
+		for (unsigned int i = 0; i < result_node1->elem_num; i++){
+			*(result_node1->elem + i) = *(big_int_node->elem + i);
+		}
 		big_int_node = big_int_node->lower;
+		result_node2 = (BigInt *)malloc(sizeof(BigInt));
+		if(!result_node2){
+			result_node1 = BigIntFindHead(result_node1);
+			BigIntDestroy(result_node1);
+			result = NULL;
+			break;			
+		}
+		result_node1->lower = result_node2;
+		result_node2->higher = result_node1;
+		result_node1 = result_node2;
 	}
-
+	result_node1->lower = NULL;
+	return result;
 }
 
 BigInt *BigIntSplitNode(BigInt *big_int, unsigned int split_index){
@@ -676,8 +706,14 @@ BigInt *BigIntUnsignedSub(BigInt *big_a, BigInt *big_b, unsigned char lo_carry){
 BigInt *BigIntAdd(BigInt *big_a, BigInt *big_b){
 	BigInt *result;
 
-	if((big_a) && (!big_b)) return big_a;
-	if((!big_a) && (big_b)) return big_b;
+	if((big_a) && (!big_b)){
+		result = BigIntCopy(big_a);
+		return result;
+	} 
+	if((!big_a) && (big_b)){
+		result = BigIntCopy(big_b);
+		return result;		
+	} 
 	if((!big_a) && (!big_b)) return NULL;
 
 	if(big_a->sign == big_b->sign){
@@ -717,16 +753,50 @@ BigInt *BigIntAdd(BigInt *big_a, BigInt *big_b){
 BigInt *BigIntSub(BigInt *big_a, BigInt *big_b){
 	BigInt *result;
 
-	if((big_a) && (!big_b)) return big_a;
-	if((!big_a) && (big_b)) return big_b;
+	if((big_a) && (!big_b)){
+		result = BigIntCopy(big_a);
+		return result;
+	} 
+	if((!big_a) && (big_b)){
+		result = BigIntCopy(big_b);
+		return result;
+	} 
 	if((!big_a) && (!big_b)) return NULL;
 
-
 	if(big_a->sign == 1){
-		if()
+		if(big_b->sign == 1){
+			if(BigIntUnsignedCmp(big_a, big_b) >= 0){
+				result = BigIntUnsignedSub(big_a, big_b, 0);
+				if(!result) return NULL;
+				result->sign = 1;
+			}else{
+				result = BigIntUnsignedSub(big_b, big_a, 0);
+				if(!result) return NULL;
+				result->sign = -1;				
+			}
+		}else{
+			result = BigIntUnsignedAdd(big_a, big_b, 0);
+			if(!result) return NULL;
+			result->sign = 1;
+		}
 	}else{
-
+		if(big_b->sign == 1){
+			result = BigIntUnsignedAdd(big_a, big_b, 0);
+			if(!result) return NULL;
+			result->sign = -1;			
+		}else{
+			if(BigIntUnsignedCmp(big_a, big_b) > 0){
+				result = BigIntUnsignedSub(big_a, big_b, 0);
+				if(!result) return NULL;
+				result->sign = -1;
+			}else{
+				result = BigIntUnsignedSub(big_b, big_a, 0);
+				if(!result) return NULL;
+				result->sign = 1;				
+			}			
+		}
 	}
+	return result;
 }
 
 int main(int argc, char *argv[]){
